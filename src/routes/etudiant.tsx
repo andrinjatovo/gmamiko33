@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStudentProfile } from "@/hooks/use-student-profile";
+import { CreditBadge } from "@/components/CreditBadge";
+import { PaywallDialog } from "@/components/PaywallDialog";
 import {
   Dialog,
   DialogContent,
@@ -149,6 +151,14 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
           Ovay
         </button>
       </header>
+
+      {name ? (
+        <div className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+          <p className="text-sm text-muted-foreground">Crédit hafatra IA</p>
+          <CreditBadge studentName={name} onClick={() => setPaywall(true)} />
+        </div>
+      ) : null}
+      {name ? <PaywallDialog studentName={name} open={paywall} onOpenChange={setPaywall} /> : null}
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(({ icon: Icon, label, hint, go }) => (
