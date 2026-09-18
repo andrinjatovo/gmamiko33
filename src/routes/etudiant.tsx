@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStudentProfile } from "@/hooks/use-student-profile";
+import { CreditBadge } from "@/components/CreditBadge";
+import { PaywallDialog } from "@/components/PaywallDialog";
 import {
   Dialog,
   DialogContent,
@@ -88,6 +90,7 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
   const [search, setSearch] = useState("");
   const [locked, setLocked] = useState<{ id: string; name: string } | null>(null);
   const [codeValue, setCodeValue] = useState("");
+  const [paywall, setPaywall] = useState(false);
 
   const { data, isLoading, error } = useQuery({ queryKey: ["folders"], queryFn: () => fetchFolders() });
   const folders = (data ?? []).filter((f) => f.name.toLowerCase().includes(search.toLowerCase()));
@@ -149,6 +152,12 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
           Ovay
         </button>
       </header>
+
+      <div className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
+        <p className="text-sm text-muted-foreground">Crédit hafatra IA</p>
+        <CreditBadge studentName={studentName} onClick={() => setPaywall(true)} />
+      </div>
+      <PaywallDialog studentName={studentName} open={paywall} onOpenChange={setPaywall} />
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(({ icon: Icon, label, hint, go }) => (
