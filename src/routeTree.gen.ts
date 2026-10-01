@@ -18,11 +18,13 @@ import { Route as AdminMessagesRouteImport } from './routes/admin_.messages'
 import { Route as AdminPaiementsRouteImport } from './routes/admin_.paiements'
 import { Route as AdminQuizRouteImport } from './routes/admin_.quiz'
 import { Route as AdminSuiviRouteImport } from './routes/admin_.suivi'
+import { Route as AdminTableauRouteImport } from './routes/admin_.tableau'
 import { Route as EtudiantFolderIdRouteImport } from './routes/etudiant_.$folderId'
 import { Route as EtudiantAnalyseRouteImport } from './routes/etudiant_.analyse'
 import { Route as EtudiantAssistantRouteImport } from './routes/etudiant_.assistant'
 import { Route as EtudiantMessagesRouteImport } from './routes/etudiant_.messages'
 import { Route as EtudiantQuizRouteImport } from './routes/etudiant_.quiz'
+import { Route as EtudiantTableauRouteImport } from './routes/etudiant_.tableau'
 import { Route as EtudiantAssistantConversationIdRouteImport } from './routes/etudiant_.assistant_.$conversationId'
 import { Route as EtudiantQuizQuizIdRouteImport } from './routes/etudiant_.quiz_.$quizId'
 
@@ -71,6 +73,11 @@ const AdminSuiviRoute = AdminSuiviRouteImport.update({
   path: '/admin/suivi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTableauRoute = AdminTableauRouteImport.update({
+  id: '/admin_/tableau',
+  path: '/admin/tableau',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EtudiantFolderIdRoute = EtudiantFolderIdRouteImport.update({
   id: '/etudiant_/$folderId',
   path: '/etudiant/$folderId',
@@ -96,6 +103,11 @@ const EtudiantQuizRoute = EtudiantQuizRouteImport.update({
   path: '/etudiant/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudiantTableauRoute = EtudiantTableauRouteImport.update({
+  id: '/etudiant_/tableau',
+  path: '/etudiant/tableau',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EtudiantAssistantConversationIdRoute =
   EtudiantAssistantConversationIdRouteImport.update({
     id: '/etudiant_/assistant_/$conversationId',
@@ -118,11 +130,13 @@ export interface FileRoutesByFullPath {
   '/admin/paiements': typeof AdminPaiementsRoute
   '/admin/quiz': typeof AdminQuizRoute
   '/admin/suivi': typeof AdminSuiviRoute
+  '/admin/tableau': typeof AdminTableauRoute
   '/etudiant/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
+  '/etudiant/tableau': typeof EtudiantTableauRoute
   '/etudiant/assistant/$conversationId': typeof EtudiantAssistantConversationIdRoute
   '/etudiant/quiz/$quizId': typeof EtudiantQuizQuizIdRoute
 }
@@ -136,11 +150,13 @@ export interface FileRoutesByTo {
   '/admin/paiements': typeof AdminPaiementsRoute
   '/admin/quiz': typeof AdminQuizRoute
   '/admin/suivi': typeof AdminSuiviRoute
+  '/admin/tableau': typeof AdminTableauRoute
   '/etudiant/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
+  '/etudiant/tableau': typeof EtudiantTableauRoute
   '/etudiant/assistant/$conversationId': typeof EtudiantAssistantConversationIdRoute
   '/etudiant/quiz/$quizId': typeof EtudiantQuizQuizIdRoute
 }
@@ -155,11 +171,13 @@ export interface FileRoutesById {
   '/admin_/paiements': typeof AdminPaiementsRoute
   '/admin_/quiz': typeof AdminQuizRoute
   '/admin_/suivi': typeof AdminSuiviRoute
+  '/admin_/tableau': typeof AdminTableauRoute
   '/etudiant_/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant_/analyse': typeof EtudiantAnalyseRoute
   '/etudiant_/assistant': typeof EtudiantAssistantRoute
   '/etudiant_/messages': typeof EtudiantMessagesRoute
   '/etudiant_/quiz': typeof EtudiantQuizRoute
+  '/etudiant_/tableau': typeof EtudiantTableauRoute
   '/etudiant_/assistant_/$conversationId': typeof EtudiantAssistantConversationIdRoute
   '/etudiant_/quiz_/$quizId': typeof EtudiantQuizQuizIdRoute
 }
@@ -175,11 +193,13 @@ export interface FileRouteTypes {
     | '/admin/paiements'
     | '/admin/quiz'
     | '/admin/suivi'
+    | '/admin/tableau'
     | '/etudiant/$folderId'
     | '/etudiant/analyse'
     | '/etudiant/assistant'
     | '/etudiant/messages'
     | '/etudiant/quiz'
+    | '/etudiant/tableau'
     | '/etudiant/assistant/$conversationId'
     | '/etudiant/quiz/$quizId'
   fileRoutesByTo: FileRoutesByTo
@@ -193,11 +213,13 @@ export interface FileRouteTypes {
     | '/admin/paiements'
     | '/admin/quiz'
     | '/admin/suivi'
+    | '/admin/tableau'
     | '/etudiant/$folderId'
     | '/etudiant/analyse'
     | '/etudiant/assistant'
     | '/etudiant/messages'
     | '/etudiant/quiz'
+    | '/etudiant/tableau'
     | '/etudiant/assistant/$conversationId'
     | '/etudiant/quiz/$quizId'
   id:
@@ -211,11 +233,13 @@ export interface FileRouteTypes {
     | '/admin_/paiements'
     | '/admin_/quiz'
     | '/admin_/suivi'
+    | '/admin_/tableau'
     | '/etudiant_/$folderId'
     | '/etudiant_/analyse'
     | '/etudiant_/assistant'
     | '/etudiant_/messages'
     | '/etudiant_/quiz'
+    | '/etudiant_/tableau'
     | '/etudiant_/assistant_/$conversationId'
     | '/etudiant_/quiz_/$quizId'
   fileRoutesById: FileRoutesById
@@ -230,11 +254,13 @@ export interface RootRouteChildren {
   AdminPaiementsRoute: typeof AdminPaiementsRoute
   AdminQuizRoute: typeof AdminQuizRoute
   AdminSuiviRoute: typeof AdminSuiviRoute
+  AdminTableauRoute: typeof AdminTableauRoute
   EtudiantFolderIdRoute: typeof EtudiantFolderIdRoute
   EtudiantAnalyseRoute: typeof EtudiantAnalyseRoute
   EtudiantAssistantRoute: typeof EtudiantAssistantRoute
   EtudiantMessagesRoute: typeof EtudiantMessagesRoute
   EtudiantQuizRoute: typeof EtudiantQuizRoute
+  EtudiantTableauRoute: typeof EtudiantTableauRoute
   EtudiantAssistantConversationIdRoute: typeof EtudiantAssistantConversationIdRoute
   EtudiantQuizQuizIdRoute: typeof EtudiantQuizQuizIdRoute
 }
@@ -304,6 +330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSuiviRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin_/tableau': {
+      id: '/admin_/tableau'
+      path: '/admin/tableau'
+      fullPath: '/admin/tableau'
+      preLoaderRoute: typeof AdminTableauRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/etudiant_/$folderId': {
       id: '/etudiant_/$folderId'
       path: '/etudiant/$folderId'
@@ -339,6 +372,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtudiantQuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etudiant_/tableau': {
+      id: '/etudiant_/tableau'
+      path: '/etudiant/tableau'
+      fullPath: '/etudiant/tableau'
+      preLoaderRoute: typeof EtudiantTableauRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/etudiant_/assistant_/$conversationId': {
       id: '/etudiant_/assistant_/$conversationId'
       path: '/etudiant/assistant/$conversationId'
@@ -366,11 +406,13 @@ const rootRouteChildren: RootRouteChildren = {
   AdminPaiementsRoute: AdminPaiementsRoute,
   AdminQuizRoute: AdminQuizRoute,
   AdminSuiviRoute: AdminSuiviRoute,
+  AdminTableauRoute: AdminTableauRoute,
   EtudiantFolderIdRoute: EtudiantFolderIdRoute,
   EtudiantAnalyseRoute: EtudiantAnalyseRoute,
   EtudiantAssistantRoute: EtudiantAssistantRoute,
   EtudiantMessagesRoute: EtudiantMessagesRoute,
   EtudiantQuizRoute: EtudiantQuizRoute,
+  EtudiantTableauRoute: EtudiantTableauRoute,
   EtudiantAssistantConversationIdRoute: EtudiantAssistantConversationIdRoute,
   EtudiantQuizQuizIdRoute: EtudiantQuizQuizIdRoute,
 }
