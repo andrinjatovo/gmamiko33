@@ -12,6 +12,7 @@ import {
   Users,
   MessageCircle,
   Wallet,
+  LayoutDashboard,
 
 
   Pencil,
@@ -160,6 +161,7 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
     { icon: Users, label: "Fanaraha-maso", hint: "Mpianatra", go: () => navigate({ to: "/admin/suivi" }) },
     { icon: MessageCircle, label: "Hafatra", hint: "Vondrona", go: () => navigate({ to: "/admin/messages" }) },
     { icon: Wallet, label: "Fandoavam-bola", hint: "Crédit", go: () => navigate({ to: "/admin/paiements" }) },
+    { icon: LayoutDashboard, label: "Tabilao", hint: "Isa sy vola", go: () => navigate({ to: "/admin/tableau" }) },
   ];
 
   return (
