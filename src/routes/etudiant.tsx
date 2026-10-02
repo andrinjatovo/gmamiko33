@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Bot, Folder, GraduationCap, Loader2, Lock, MessageCircle, PackageSearch, Search, UserRound } from "lucide-react";
+import { ArrowLeft, Bot, Folder, GraduationCap, LayoutDashboard, Loader2, Lock, MessageCircle, PackageSearch, Search, UserRound } from "lucide-react";
 import { fetchFolders } from "@/lib/content.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +128,12 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
       label: "Hafatra",
       hint: "Vondron'ny fampiofanana",
       go: () => navigate({ to: "/etudiant/messages" }),
+    },
+    {
+      icon: LayoutDashboard,
+      label: "Ny fandrosoako",
+      hint: "Crédit, quiz, famakafakana",
+      go: () => navigate({ to: "/etudiant/tableau" }),
     },
   ];
 
