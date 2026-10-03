@@ -162,6 +162,7 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
     { icon: MessageCircle, label: "Hafatra", hint: "Vondrona", go: () => navigate({ to: "/admin/messages" }) },
     { icon: Wallet, label: "Fandoavam-bola", hint: "Crédit", go: () => navigate({ to: "/admin/paiements" }) },
     { icon: LayoutDashboard, label: "Tabilao", hint: "Isa sy vola", go: () => navigate({ to: "/admin/tableau" }) },
+    { icon: ShieldCheck, label: "Kaonty", hint: "Fiarovana finday", go: () => navigate({ to: "/admin/comptes" }) },
   ];
 
   return (

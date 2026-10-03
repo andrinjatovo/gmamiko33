@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useStudentProfile } from "@/hooks/use-student-profile";
 import { CreditBadge } from "@/components/CreditBadge";
 import { PaywallDialog } from "@/components/PaywallDialog";
+import { StudentAuthGate } from "@/components/StudentAuthGate";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Dialog,
   DialogContent,
@@ -33,56 +35,31 @@ export const Route = createFileRoute("/etudiant")({
 });
 
 function StudentHome() {
-  const { name, ready, save, clear } = useStudentProfile();
-  const [profileInput, setProfileInput] = useState("");
+  const { save, clear } = useStudentProfile();
+  const [verified, setVerified] = useState<string | null>(null);
 
-  if (!ready) {
+  if (!verified) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="size-7 animate-spin text-primary" />
-      </div>
+      <StudentAuthGate
+        onReady={(n) => {
+          save(n);
+          setVerified(n);
+        }}
+        onSignedOut={clear}
+      />
     );
   }
 
-  if (!name) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center px-5">
-        <div
-          className="w-full max-w-sm rounded-3xl border border-border bg-card p-6"
-          style={{ boxShadow: "var(--shadow-card)" }}
-        >
-          <div className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-accent text-primary">
-            <UserRound className="size-6" />
-          </div>
-          <h1 className="text-xl font-semibold">Mamorona ny mombamomba anao</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ny anaranao no ho anaram-piditrao ao amin'ny rindrankaja.
-          </p>
-          <form
-            className="mt-5 space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (profileInput.trim()) save(profileInput);
-            }}
-          >
-            <Label>Anarana na anaram-pihaonana</Label>
-            <Input
-              autoFocus
-              placeholder="Ohatra : Miora"
-              value={profileInput}
-              maxLength={60}
-              onChange={(e) => setProfileInput(e.target.value)}
-            />
-            <Button type="submit" className="w-full" disabled={!profileInput.trim()}>
-              Manohy
-            </Button>
-          </form>
-        </div>
-      </main>
-    );
-  }
-
-  return <StudentFolders studentName={name} onSwitchProfile={clear} />;
+  return (
+    <StudentFolders
+      studentName={verified}
+      onSwitchProfile={async () => {
+        await supabase.auth.signOut();
+        clear();
+        setVerified(null);
+      }}
+    />
+  );
 }
 
 function StudentFolders({ studentName, onSwitchProfile }: { studentName: string; onSwitchProfile: () => void }) {
