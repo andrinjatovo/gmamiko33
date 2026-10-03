@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as EtudiantRouteImport } from './routes/etudiant'
 import { Route as AdminFolderIdRouteImport } from './routes/admin_.$folderId'
+import { Route as AdminComptesRouteImport } from './routes/admin_.comptes'
 import { Route as AdminConnaissancesRouteImport } from './routes/admin_.connaissances'
 import { Route as AdminMessagesRouteImport } from './routes/admin_.messages'
 import { Route as AdminPaiementsRouteImport } from './routes/admin_.paiements'
@@ -46,6 +47,11 @@ const EtudiantRoute = EtudiantRouteImport.update({
 const AdminFolderIdRoute = AdminFolderIdRouteImport.update({
   id: '/admin_/$folderId',
   path: '/admin/$folderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminComptesRoute = AdminComptesRouteImport.update({
+  id: '/admin_/comptes',
+  path: '/admin/comptes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminConnaissancesRoute = AdminConnaissancesRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/etudiant': typeof EtudiantRoute
   '/admin/$folderId': typeof AdminFolderIdRoute
+  '/admin/comptes': typeof AdminComptesRoute
   '/admin/connaissances': typeof AdminConnaissancesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/paiements': typeof AdminPaiementsRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/etudiant': typeof EtudiantRoute
   '/admin/$folderId': typeof AdminFolderIdRoute
+  '/admin/comptes': typeof AdminComptesRoute
   '/admin/connaissances': typeof AdminConnaissancesRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/paiements': typeof AdminPaiementsRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/etudiant': typeof EtudiantRoute
   '/admin_/$folderId': typeof AdminFolderIdRoute
+  '/admin_/comptes': typeof AdminComptesRoute
   '/admin_/connaissances': typeof AdminConnaissancesRoute
   '/admin_/messages': typeof AdminMessagesRoute
   '/admin_/paiements': typeof AdminPaiementsRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/etudiant'
     | '/admin/$folderId'
+    | '/admin/comptes'
     | '/admin/connaissances'
     | '/admin/messages'
     | '/admin/paiements'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/etudiant'
     | '/admin/$folderId'
+    | '/admin/comptes'
     | '/admin/connaissances'
     | '/admin/messages'
     | '/admin/paiements'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/etudiant'
     | '/admin_/$folderId'
+    | '/admin_/comptes'
     | '/admin_/connaissances'
     | '/admin_/messages'
     | '/admin_/paiements'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   EtudiantRoute: typeof EtudiantRoute
   AdminFolderIdRoute: typeof AdminFolderIdRoute
+  AdminComptesRoute: typeof AdminComptesRoute
   AdminConnaissancesRoute: typeof AdminConnaissancesRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminPaiementsRoute: typeof AdminPaiementsRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/$folderId'
       fullPath: '/admin/$folderId'
       preLoaderRoute: typeof AdminFolderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/comptes': {
+      id: '/admin_/comptes'
+      path: '/admin/comptes'
+      fullPath: '/admin/comptes'
+      preLoaderRoute: typeof AdminComptesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/connaissances': {
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   EtudiantRoute: EtudiantRoute,
   AdminFolderIdRoute: AdminFolderIdRoute,
+  AdminComptesRoute: AdminComptesRoute,
   AdminConnaissancesRoute: AdminConnaissancesRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminPaiementsRoute: AdminPaiementsRoute,
