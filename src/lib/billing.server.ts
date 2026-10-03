@@ -59,6 +59,12 @@ export class PaywallError extends Error {
 /** Déduit 1 crédit (ou l'essai gratuit). Lève PaywallError si le solde est nul. */
 export async function consumeCredit(studentName: string): Promise<"free" | "credit"> {
   const name = normName(studentName);
+  const { data: prof } = await supabaseAdmin
+    .from("student_profiles")
+    .select("blocked")
+    .eq("display_name", name)
+    .maybeSingle();
+  if (prof?.blocked) throw new Error("Voasakana ity kaonty ity (kaonty maromaro amin'ny finday iray).");
   const { data, error } = await supabaseAdmin.rpc("consume_message_credit", { p_student: name });
   if (error) throw new Error(error.message);
   if (data === "free" || data === "credit") return data;
