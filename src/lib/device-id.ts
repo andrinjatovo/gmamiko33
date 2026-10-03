@@ -1,22 +1,18 @@
-// Empreinte du téléphone : identifiant stocké + caractéristiques matérielles.
-// Les caractéristiques matérielles restent identiques même si le stockage est vidé.
-async function sha256(text: string) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+// Identifiant unique du téléphone, conservé dans le stockage local ET un cookie longue durée
+// (si l'un est effacé, l'autre le restaure).
+const KEY = "gm_device_id";
+
+function readCookie() {
+  const m = document.cookie.match(new RegExp(`(?:^|; )${KEY}=([a-f0-9]+)`));
+  return m?.[1] ?? null;
 }
 
-export async function getDeviceHash() {
-  const n = navigator as Navigator & { deviceMemory?: number };
-  const parts = [
-    n.userAgent,
-    n.platform,
-    n.language,
-    String(n.hardwareConcurrency ?? ""),
-    String(n.deviceMemory ?? ""),
-    `${screen.width}x${screen.height}x${screen.colorDepth}`,
-    String(window.devicePixelRatio),
-    Intl.DateTimeFormat().resolvedOptions().timeZone,
-    String(n.maxTouchPoints ?? 0),
-  ];
-  return sha256(parts.join("|"));
+export function getDeviceHash() {
+  let id = localStorage.getItem(KEY) || readCookie();
+  if (!id || !/^[a-f0-9]{32,}$/.test(id)) {
+    id = Array.from(crypto.getRandomValues(new Uint8Array(24)), (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  localStorage.setItem(KEY, id);
+  document.cookie = `${KEY}=${id}; max-age=${60 * 60 * 24 * 365 * 5}; path=/; SameSite=Lax`;
+  return id;
 }
