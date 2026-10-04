@@ -23,7 +23,9 @@ import { Route as AdminTableauRouteImport } from './routes/admin_.tableau'
 import { Route as EtudiantFolderIdRouteImport } from './routes/etudiant_.$folderId'
 import { Route as EtudiantAnalyseRouteImport } from './routes/etudiant_.analyse'
 import { Route as EtudiantAssistantRouteImport } from './routes/etudiant_.assistant'
+import { Route as EtudiantCommandesRouteImport } from './routes/etudiant_.commandes'
 import { Route as EtudiantMessagesRouteImport } from './routes/etudiant_.messages'
+import { Route as EtudiantProfilRouteImport } from './routes/etudiant_.profil'
 import { Route as EtudiantQuizRouteImport } from './routes/etudiant_.quiz'
 import { Route as EtudiantTableauRouteImport } from './routes/etudiant_.tableau'
 import { Route as EtudiantAssistantConversationIdRouteImport } from './routes/etudiant_.assistant_.$conversationId'
@@ -99,9 +101,19 @@ const EtudiantAssistantRoute = EtudiantAssistantRouteImport.update({
   path: '/etudiant/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudiantCommandesRoute = EtudiantCommandesRouteImport.update({
+  id: '/etudiant_/commandes',
+  path: '/etudiant/commandes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EtudiantMessagesRoute = EtudiantMessagesRouteImport.update({
   id: '/etudiant_/messages',
   path: '/etudiant/messages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EtudiantProfilRoute = EtudiantProfilRouteImport.update({
+  id: '/etudiant_/profil',
+  path: '/etudiant/profil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EtudiantQuizRoute = EtudiantQuizRouteImport.update({
@@ -141,7 +153,9 @@ export interface FileRoutesByFullPath {
   '/etudiant/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
+  '/etudiant/commandes': typeof EtudiantCommandesRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
+  '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
   '/etudiant/tableau': typeof EtudiantTableauRoute
   '/etudiant/assistant/$conversationId': typeof EtudiantAssistantConversationIdRoute
@@ -162,7 +176,9 @@ export interface FileRoutesByTo {
   '/etudiant/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
+  '/etudiant/commandes': typeof EtudiantCommandesRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
+  '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
   '/etudiant/tableau': typeof EtudiantTableauRoute
   '/etudiant/assistant/$conversationId': typeof EtudiantAssistantConversationIdRoute
@@ -184,7 +200,9 @@ export interface FileRoutesById {
   '/etudiant_/$folderId': typeof EtudiantFolderIdRoute
   '/etudiant_/analyse': typeof EtudiantAnalyseRoute
   '/etudiant_/assistant': typeof EtudiantAssistantRoute
+  '/etudiant_/commandes': typeof EtudiantCommandesRoute
   '/etudiant_/messages': typeof EtudiantMessagesRoute
+  '/etudiant_/profil': typeof EtudiantProfilRoute
   '/etudiant_/quiz': typeof EtudiantQuizRoute
   '/etudiant_/tableau': typeof EtudiantTableauRoute
   '/etudiant_/assistant_/$conversationId': typeof EtudiantAssistantConversationIdRoute
@@ -207,7 +225,9 @@ export interface FileRouteTypes {
     | '/etudiant/$folderId'
     | '/etudiant/analyse'
     | '/etudiant/assistant'
+    | '/etudiant/commandes'
     | '/etudiant/messages'
+    | '/etudiant/profil'
     | '/etudiant/quiz'
     | '/etudiant/tableau'
     | '/etudiant/assistant/$conversationId'
@@ -228,7 +248,9 @@ export interface FileRouteTypes {
     | '/etudiant/$folderId'
     | '/etudiant/analyse'
     | '/etudiant/assistant'
+    | '/etudiant/commandes'
     | '/etudiant/messages'
+    | '/etudiant/profil'
     | '/etudiant/quiz'
     | '/etudiant/tableau'
     | '/etudiant/assistant/$conversationId'
@@ -249,7 +271,9 @@ export interface FileRouteTypes {
     | '/etudiant_/$folderId'
     | '/etudiant_/analyse'
     | '/etudiant_/assistant'
+    | '/etudiant_/commandes'
     | '/etudiant_/messages'
+    | '/etudiant_/profil'
     | '/etudiant_/quiz'
     | '/etudiant_/tableau'
     | '/etudiant_/assistant_/$conversationId'
@@ -271,7 +295,9 @@ export interface RootRouteChildren {
   EtudiantFolderIdRoute: typeof EtudiantFolderIdRoute
   EtudiantAnalyseRoute: typeof EtudiantAnalyseRoute
   EtudiantAssistantRoute: typeof EtudiantAssistantRoute
+  EtudiantCommandesRoute: typeof EtudiantCommandesRoute
   EtudiantMessagesRoute: typeof EtudiantMessagesRoute
+  EtudiantProfilRoute: typeof EtudiantProfilRoute
   EtudiantQuizRoute: typeof EtudiantQuizRoute
   EtudiantTableauRoute: typeof EtudiantTableauRoute
   EtudiantAssistantConversationIdRoute: typeof EtudiantAssistantConversationIdRoute
@@ -378,11 +404,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtudiantAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etudiant_/commandes': {
+      id: '/etudiant_/commandes'
+      path: '/etudiant/commandes'
+      fullPath: '/etudiant/commandes'
+      preLoaderRoute: typeof EtudiantCommandesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/etudiant_/messages': {
       id: '/etudiant_/messages'
       path: '/etudiant/messages'
       fullPath: '/etudiant/messages'
       preLoaderRoute: typeof EtudiantMessagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/etudiant_/profil': {
+      id: '/etudiant_/profil'
+      path: '/etudiant/profil'
+      fullPath: '/etudiant/profil'
+      preLoaderRoute: typeof EtudiantProfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/etudiant_/quiz': {
@@ -431,7 +471,9 @@ const rootRouteChildren: RootRouteChildren = {
   EtudiantFolderIdRoute: EtudiantFolderIdRoute,
   EtudiantAnalyseRoute: EtudiantAnalyseRoute,
   EtudiantAssistantRoute: EtudiantAssistantRoute,
+  EtudiantCommandesRoute: EtudiantCommandesRoute,
   EtudiantMessagesRoute: EtudiantMessagesRoute,
+  EtudiantProfilRoute: EtudiantProfilRoute,
   EtudiantQuizRoute: EtudiantQuizRoute,
   EtudiantTableauRoute: EtudiantTableauRoute,
   EtudiantAssistantConversationIdRoute: EtudiantAssistantConversationIdRoute,

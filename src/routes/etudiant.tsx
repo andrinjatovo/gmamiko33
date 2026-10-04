@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Bot, Folder, GraduationCap, LayoutDashboard, Loader2, Lock, MessageCircle, PackageSearch, Search, UserRound } from "lucide-react";
+import { ArrowLeft, Bot, Folder, GraduationCap, LayoutDashboard, Loader2, Lock, MessageCircle, PackageSearch, Receipt, Search, ShoppingCart, UserRound } from "lucide-react";
 import { fetchFolders } from "@/lib/content.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -112,6 +112,18 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
       hint: "Crédit, quiz, famakafakana",
       go: () => navigate({ to: "/etudiant/tableau" }),
     },
+    {
+      icon: UserRound,
+      label: "Ny mombamomba ahy",
+      hint: "Sary, anarana, traikefa",
+      go: () => navigate({ to: "/etudiant/profil" }),
+    },
+    {
+      icon: Receipt,
+      label: "Tantaran'ny fividianana",
+      hint: "Ny crédit novidiko",
+      go: () => navigate({ to: "/etudiant/commandes" }),
+    },
   ];
 
   return (
@@ -136,9 +148,14 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
         </button>
       </header>
 
-      <div className="mt-3 flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3">
-        <p className="text-sm text-muted-foreground">Crédit hafatra IA</p>
-        <CreditBadge studentName={studentName} onClick={() => setPaywall(true)} />
+      <div className="mt-3 flex items-center justify-between gap-2 rounded-2xl border border-border bg-card px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="text-sm text-muted-foreground">Crédit IA</p>
+          <CreditBadge studentName={studentName} onClick={() => setPaywall(true)} />
+        </div>
+        <Button size="sm" onClick={() => setPaywall(true)}>
+          <ShoppingCart className="mr-1.5 size-4" /> Hividy crédit
+        </Button>
       </div>
       <PaywallDialog studentName={studentName} open={paywall} onOpenChange={setPaywall} />
 
