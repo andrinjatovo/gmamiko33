@@ -129,7 +129,7 @@ function Profile() {
           <div className="grid gap-1.5">
             <Label>Ambaratonga</Label>
             <div className="grid grid-cols-2 gap-2">
-              {[["debutant", "Vao manomboka"], ["expert", "Efa manam-pahaizana"]].map(([v, l]) => (
+              {([["debutant", "Vao manomboka"], ["expert", "Efa manam-pahaizana"]] as const).map(([v, l]) => (
                 <button key={v} onClick={() => setF({ ...f, level: v })}
                   className={`rounded-xl border p-3 text-sm font-medium ${f.level === v ? "border-primary bg-accent text-primary" : "border-border"}`}>
                   {l}
