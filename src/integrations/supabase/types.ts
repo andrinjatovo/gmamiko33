@@ -679,29 +679,53 @@ export type Database = {
       }
       student_profiles: {
         Row: {
+          age: number | null
+          avatar_path: string | null
           block_reason: string | null
           blocked: boolean
+          country: string | null
           created_at: string
           display_name: string | null
           email: string
+          full_name: string | null
+          gender: string | null
+          import_years: number | null
+          level: string | null
+          phone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          age?: number | null
+          avatar_path?: string | null
           block_reason?: string | null
           blocked?: boolean
+          country?: string | null
           created_at?: string
           display_name?: string | null
           email: string
+          full_name?: string | null
+          gender?: string | null
+          import_years?: number | null
+          level?: string | null
+          phone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          age?: number | null
+          avatar_path?: string | null
           block_reason?: string | null
           blocked?: boolean
+          country?: string | null
           created_at?: string
           display_name?: string | null
           email?: string
+          full_name?: string | null
+          gender?: string | null
+          import_years?: number | null
+          level?: string | null
+          phone?: string | null
           updated_at?: string
           user_id?: string
         }
