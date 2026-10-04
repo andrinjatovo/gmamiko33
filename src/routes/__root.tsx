@@ -132,9 +132,21 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-    if (window.location.hostname === "localhost") return;
-    navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    // After a new release, old pages may reference files that no longer exist: reload once.
+    const onPreloadError = (e: Event) => {
+      e.preventDefault();
+      const key = "gm_chunk_reload";
+      const last = Number(sessionStorage.getItem(key) ?? 0);
+      if (Date.now() - last > 10000) {
+        sessionStorage.setItem(key, String(Date.now()));
+        window.location.reload();
+      }
+    };
+    window.addEventListener("vite:preloadError", onPreloadError);
+    if ("serviceWorker" in navigator && window.location.hostname !== "localhost") {
+      navigator.serviceWorker.register("/sw.js").then((r) => r.update()).catch(() => undefined);
+    }
+    return () => window.removeEventListener("vite:preloadError", onPreloadError);
   }, []);
 
   return (
