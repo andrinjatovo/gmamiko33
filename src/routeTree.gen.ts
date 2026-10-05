@@ -24,6 +24,7 @@ import { Route as EtudiantFolderIdRouteImport } from './routes/etudiant_.$folder
 import { Route as EtudiantAnalyseRouteImport } from './routes/etudiant_.analyse'
 import { Route as EtudiantAssistantRouteImport } from './routes/etudiant_.assistant'
 import { Route as EtudiantCommandesRouteImport } from './routes/etudiant_.commandes'
+import { Route as EtudiantFahaizanaRouteImport } from './routes/etudiant_.fahaizana'
 import { Route as EtudiantMessagesRouteImport } from './routes/etudiant_.messages'
 import { Route as EtudiantProfilRouteImport } from './routes/etudiant_.profil'
 import { Route as EtudiantQuizRouteImport } from './routes/etudiant_.quiz'
@@ -106,6 +107,11 @@ const EtudiantCommandesRoute = EtudiantCommandesRouteImport.update({
   path: '/etudiant/commandes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudiantFahaizanaRoute = EtudiantFahaizanaRouteImport.update({
+  id: '/etudiant_/fahaizana',
+  path: '/etudiant/fahaizana',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EtudiantMessagesRoute = EtudiantMessagesRouteImport.update({
   id: '/etudiant_/messages',
   path: '/etudiant/messages',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
   '/etudiant/commandes': typeof EtudiantCommandesRoute
+  '/etudiant/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
   '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/etudiant/analyse': typeof EtudiantAnalyseRoute
   '/etudiant/assistant': typeof EtudiantAssistantRoute
   '/etudiant/commandes': typeof EtudiantCommandesRoute
+  '/etudiant/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
   '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/etudiant_/analyse': typeof EtudiantAnalyseRoute
   '/etudiant_/assistant': typeof EtudiantAssistantRoute
   '/etudiant_/commandes': typeof EtudiantCommandesRoute
+  '/etudiant_/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant_/messages': typeof EtudiantMessagesRoute
   '/etudiant_/profil': typeof EtudiantProfilRoute
   '/etudiant_/quiz': typeof EtudiantQuizRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/etudiant/analyse'
     | '/etudiant/assistant'
     | '/etudiant/commandes'
+    | '/etudiant/fahaizana'
     | '/etudiant/messages'
     | '/etudiant/profil'
     | '/etudiant/quiz'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/etudiant/analyse'
     | '/etudiant/assistant'
     | '/etudiant/commandes'
+    | '/etudiant/fahaizana'
     | '/etudiant/messages'
     | '/etudiant/profil'
     | '/etudiant/quiz'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/etudiant_/analyse'
     | '/etudiant_/assistant'
     | '/etudiant_/commandes'
+    | '/etudiant_/fahaizana'
     | '/etudiant_/messages'
     | '/etudiant_/profil'
     | '/etudiant_/quiz'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   EtudiantAnalyseRoute: typeof EtudiantAnalyseRoute
   EtudiantAssistantRoute: typeof EtudiantAssistantRoute
   EtudiantCommandesRoute: typeof EtudiantCommandesRoute
+  EtudiantFahaizanaRoute: typeof EtudiantFahaizanaRoute
   EtudiantMessagesRoute: typeof EtudiantMessagesRoute
   EtudiantProfilRoute: typeof EtudiantProfilRoute
   EtudiantQuizRoute: typeof EtudiantQuizRoute
@@ -411,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtudiantCommandesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etudiant_/fahaizana': {
+      id: '/etudiant_/fahaizana'
+      path: '/etudiant/fahaizana'
+      fullPath: '/etudiant/fahaizana'
+      preLoaderRoute: typeof EtudiantFahaizanaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/etudiant_/messages': {
       id: '/etudiant_/messages'
       path: '/etudiant/messages'
@@ -472,6 +492,7 @@ const rootRouteChildren: RootRouteChildren = {
   EtudiantAnalyseRoute: EtudiantAnalyseRoute,
   EtudiantAssistantRoute: EtudiantAssistantRoute,
   EtudiantCommandesRoute: EtudiantCommandesRoute,
+  EtudiantFahaizanaRoute: EtudiantFahaizanaRoute,
   EtudiantMessagesRoute: EtudiantMessagesRoute,
   EtudiantProfilRoute: EtudiantProfilRoute,
   EtudiantQuizRoute: EtudiantQuizRoute,

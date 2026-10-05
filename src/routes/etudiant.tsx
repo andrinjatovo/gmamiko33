@@ -124,6 +124,12 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
       hint: "Ny crédit novidiko",
       go: () => navigate({ to: "/etudiant/commandes" }),
     },
+    {
+      icon: GraduationCap,
+      label: "Zarao ny fahaizanao",
+      hint: "Hevitra sy traikefa ho an'ny IA",
+      go: () => navigate({ to: "/etudiant/fahaizana" }),
+    },
   ];
 
   return (
