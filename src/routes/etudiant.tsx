@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStudentProfile } from "@/hooks/use-student-profile";
+import { LangSwitch } from "@/components/LangSwitch";
+import { useLang } from "@/hooks/use-lang";
 import { CreditBadge } from "@/components/CreditBadge";
 import { PaywallDialog } from "@/components/PaywallDialog";
 import { StudentAuthGate } from "@/components/StudentAuthGate";
@@ -82,16 +84,17 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
     }
   };
 
+  const { t } = useLang();
   const tools = [
-    { icon: PackageSearch, label: "Famakafakana vokatra", hint: "Vidiny, fitaterana, tombony", tone: "var(--gradient-accent)", go: () => navigate({ to: "/etudiant/analyse" }) },
-    { icon: LayoutDashboard, label: "Ny fandrosoako", hint: "Crédit, quiz, famakafakana", tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/tableau" }) },
-    { icon: Receipt, label: "Tantaran'ny fividianana", hint: "Ny crédit novidiko", tone: "var(--gradient-china)", go: () => navigate({ to: "/etudiant/commandes" }) },
-    { icon: UserRound, label: "Ny mombamomba ahy", hint: "Sary, anarana, traikefa", tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/profil" }) },
+    { icon: PackageSearch, label: t("Famakafakana vokatra", "Analyse produit"), hint: t("Vidiny, fitaterana, tombony", "Prix, transport, marge"), tone: "var(--gradient-accent)", go: () => navigate({ to: "/etudiant/analyse" }) },
+    { icon: LayoutDashboard, label: t("Ny fandrosoako", "Ma progression"), hint: t("Crédit, quiz, famakafakana", "Crédits, quiz, analyses"), tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/tableau" }) },
+    { icon: Receipt, label: t("Tantaran'ny fividianana", "Historique d'achats"), hint: t("Ny crédit novidiko", "Mes crédits achetés"), tone: "var(--gradient-china)", go: () => navigate({ to: "/etudiant/commandes" }) },
+    { icon: UserRound, label: t("Ny mombamomba ahy", "Mon profil"), hint: t("Sary, anarana, traikefa", "Photo, nom, expérience"), tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/profil" }) },
   ];
   const learn = [
-    { icon: GraduationCap, label: "Fanadinana", hint: "Andramo ny fahalalanao", go: () => navigate({ to: "/etudiant/quiz" }) },
-    { icon: MessageCircle, label: "Hafatra", hint: "Vondron'ny fampiofanana", go: () => navigate({ to: "/etudiant/messages" }) },
-    { icon: Lightbulb, label: "Zarao ny fahaizanao", hint: "Hevitra ho an'ny IA", go: () => navigate({ to: "/etudiant/fahaizana" }) },
+    { icon: GraduationCap, label: t("Fanadinana", "Quiz"), hint: t("Andramo ny fahalalanao", "Testez vos connaissances"), go: () => navigate({ to: "/etudiant/quiz" }) },
+    { icon: MessageCircle, label: t("Hafatra", "Messages"), hint: t("Vondron'ny fampiofanana", "Groupe de formation"), go: () => navigate({ to: "/etudiant/messages" }) },
+    { icon: Lightbulb, label: t("Zarao ny fahaizanao", "Partagez vos savoirs"), hint: t("Hevitra ho an'ny IA", "Idées pour l'IA"), go: () => navigate({ to: "/etudiant/fahaizana" }) },
   ];
 
   const dash = useQuery({
@@ -101,9 +104,9 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
   const d = dash.data;
   const stats = [
     { icon: Coins, label: "Crédit IA", value: d ? (d.credits > 0 ? d.credits : d.freeUsed ? 0 : "1 free") : "…", onClick: () => setPaywall(true) },
-    { icon: PackageSearch, label: "Famakafakana", value: d?.analysesCount ?? "…" },
+    { icon: PackageSearch, label: t("Famakafakana", "Analyses"), value: d?.analysesCount ?? "…" },
     { icon: TrendingUp, label: "Quiz", value: d ? `${d.quizPct}%` : "…" },
-    { icon: Bot, label: "Resaka", value: d?.lastConversations.length ?? "…" },
+    { icon: Bot, label: t("Resaka", "Discussions"), value: d?.lastConversations.length ?? "…" },
   ];
 
   return (
@@ -113,13 +116,14 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
           <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             <span className="text-china">Shina</span> <span className="text-primary">→</span> <span className="text-mada">Madagasikara</span>
           </p>
-          <h1 className="truncate text-xl font-bold">Manao ahoana {studentName}</h1>
-          <p className="text-xs text-muted-foreground">Mpanampy Business Fanafarana</p>
+          <h1 className="truncate text-xl font-bold">{t("Manao ahoana", "Bonjour")} {studentName}</h1>
+          <p className="text-xs text-muted-foreground">{t("Mpanampy Business Fanafarana", "Assistant Business Import")}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <LangSwitch />
           <CreditBadge studentName={studentName} onClick={() => setPaywall(true)} />
           <button onClick={onSwitchProfile} className="pressable rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
-            Ovay
+            {t("Ovay", "Changer")}
           </button>
         </div>
       </header>
@@ -135,21 +139,21 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
             <Bot className="size-6" />
           </span>
           <div className="min-w-0">
-            <p className="text-lg font-bold">Mpanampy Fanafarana IA</p>
-            <p className="text-sm text-muted-foreground">Anontanio izay tianao momba ny business fanafarana Shina → Mada.</p>
+            <p className="text-lg font-bold">{t("Mpanampy Fanafarana IA", "Assistant Import IA")}</p>
+            <p className="text-sm text-muted-foreground">{t("Anontanio izay tianao momba ny business fanafarana Shina → Mada.", "Posez toutes vos questions sur l'import Chine → Madagascar.")}</p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button className="pressable" onClick={() => navigate({ to: "/etudiant/assistant" })}>
-            <Sparkles className="mr-1.5 size-4" /> Hanontany ny mpanampy
+            <Sparkles className="mr-1.5 size-4" /> {t("Hanontany ny mpanampy", "Poser une question")}
           </Button>
           <Button variant="secondary" className="pressable" onClick={() => setPaywall(true)}>
-            <ShoppingCart className="mr-1.5 size-4" /> Hividy crédit
+            <ShoppingCart className="mr-1.5 size-4" /> {t("Hividy crédit", "Acheter des crédits")}
           </Button>
         </div>
       </section>
 
-      <SectionTitle>Ny asako</SectionTitle>
+      <SectionTitle>{t("Ny asako", "Mon activité")}</SectionTitle>
       <div className="grid grid-cols-4 gap-2">
         {stats.map(({ icon: Icon, label, value, onClick }, i) => (
           <button
@@ -166,7 +170,7 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
         ))}
       </div>
 
-      <SectionTitle>Fitaovana fanafarana</SectionTitle>
+      <SectionTitle>{t("Fitaovana fanafarana", "Outils import")}</SectionTitle>
       <div className="grid grid-cols-2 gap-2.5">
         {tools.map(({ icon: Icon, label, hint, tone, go }, i) => (
           <button
@@ -186,7 +190,7 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
         ))}
       </div>
 
-      <SectionTitle>Mianatra</SectionTitle>
+      <SectionTitle>{t("Mianatra", "Apprendre")}</SectionTitle>
       <div className="grid grid-cols-3 gap-2.5">
         {learn.map(({ icon: Icon, label, hint, go }) => (
           <button key={label} onClick={go} className="pressable flex flex-col items-start gap-1.5 rounded-2xl border border-border bg-card p-3 text-left">
@@ -199,12 +203,12 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
         ))}
       </div>
 
-      <SectionTitle>Ny fampiofanako</SectionTitle>
+      <SectionTitle>{t("Ny fampiofanako", "Mes formations")}</SectionTitle>
       <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           className="bg-card pl-9"
-          placeholder="Hitady dosie"
+          placeholder={t("Hitady dosie", "Rechercher un dossier")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -216,10 +220,10 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
           <Loader2 className="size-7 animate-spin text-primary" />
         </div>
       ) : error ? (
-        <p className="text-sm text-destructive">Tsy afaka naka ny dosie.</p>
+        <p className="text-sm text-destructive">{t("Tsy afaka naka ny dosie.", "Impossible de charger les dossiers.")}</p>
       ) : folders.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Tsy misy dosie azo jerena.
+          {t("Tsy misy dosie azo jerena.", "Aucun dossier disponible.")}
         </p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
@@ -238,10 +242,10 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
                   <span className="flex items-center gap-1 text-xs text-muted-foreground">
                     {f.protected ? (
                       <>
-                        <Lock className="size-3" /> Mila kaody
+                        <Lock className="size-3" /> {t("Mila kaody", "Code requis")}
                       </>
                     ) : (
-                      "Tsy misy fameperana"
+                      t("Tsy misy fameperana", "Accès libre")
                     )}
                   </span>
                 </span>
@@ -254,20 +258,20 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
       <Dialog open={!!locked} onOpenChange={(o) => !o && setLocked(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Ampidiro ny kaody fidirana</DialogTitle>
-            <DialogDescription>Dosie voaro : {locked?.name}</DialogDescription>
+            <DialogTitle>{t("Ampidiro ny kaody fidirana", "Saisissez le code d'accès")}</DialogTitle>
+            <DialogDescription>{t("Dosie voaro", "Dossier protégé")} : {locked?.name}</DialogDescription>
           </DialogHeader>
           <Input
             autoFocus
             type="password"
             inputMode="numeric"
-            placeholder="Kaodin'ny dosie"
+            placeholder={t("Kaodin'ny dosie", "Code du dossier")}
             value={codeValue}
             onChange={(e) => setCodeValue(e.target.value)}
           />
           <DialogFooter>
             <Button variant="ghost" onClick={() => setLocked(null)}>
-              Aoka ihany
+              {t("Aoka ihany", "Annuler")}
             </Button>
             <Button
               disabled={!codeValue.trim()}
@@ -280,7 +284,7 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
                 })
               }
             >
-              Sokafy
+              {t("Sokafy", "Ouvrir")}
             </Button>
           </DialogFooter>
         </DialogContent>
