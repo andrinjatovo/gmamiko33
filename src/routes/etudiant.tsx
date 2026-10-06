@@ -81,118 +81,128 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
     }
   };
 
-  const tiles = [
-    {
-      icon: Bot,
-      label: "Mpanampy Fanafarana",
-      hint: "Ny fanontanianao Shina → Mada",
-      go: () => navigate({ to: "/etudiant/assistant" }),
-    },
-    {
-      icon: PackageSearch,
-      label: "Famakafakana vokatra",
-      hint: "Tombom-barotra sy fanapahan-kevitra",
-      go: () => navigate({ to: "/etudiant/analyse" }),
-    },
-    {
-      icon: GraduationCap,
-      label: "Fanadinana",
-      hint: "Andramo ny fahalalanao",
-      go: () => navigate({ to: "/etudiant/quiz" }),
-    },
-    {
-      icon: MessageCircle,
-      label: "Hafatra",
-      hint: "Vondron'ny fampiofanana",
-      go: () => navigate({ to: "/etudiant/messages" }),
-    },
-    {
-      icon: LayoutDashboard,
-      label: "Ny fandrosoako",
-      hint: "Crédit, quiz, famakafakana",
-      go: () => navigate({ to: "/etudiant/tableau" }),
-    },
-    {
-      icon: UserRound,
-      label: "Ny mombamomba ahy",
-      hint: "Sary, anarana, traikefa",
-      go: () => navigate({ to: "/etudiant/profil" }),
-    },
-    {
-      icon: Receipt,
-      label: "Tantaran'ny fividianana",
-      hint: "Ny crédit novidiko",
-      go: () => navigate({ to: "/etudiant/commandes" }),
-    },
-    {
-      icon: GraduationCap,
-      label: "Zarao ny fahaizanao",
-      hint: "Hevitra sy traikefa ho an'ny IA",
-      go: () => navigate({ to: "/etudiant/fahaizana" }),
-    },
+  const tools = [
+    { icon: PackageSearch, label: "Famakafakana vokatra", hint: "Vidiny, fitaterana, tombony", tone: "var(--gradient-accent)", go: () => navigate({ to: "/etudiant/analyse" }) },
+    { icon: LayoutDashboard, label: "Ny fandrosoako", hint: "Crédit, quiz, famakafakana", tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/tableau" }) },
+    { icon: Receipt, label: "Tantaran'ny fividianana", hint: "Ny crédit novidiko", tone: "var(--gradient-china)", go: () => navigate({ to: "/etudiant/commandes" }) },
+    { icon: UserRound, label: "Ny mombamomba ahy", hint: "Sary, anarana, traikefa", tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/profil" }) },
+  ];
+  const learn = [
+    { icon: GraduationCap, label: "Fanadinana", hint: "Andramo ny fahalalanao", go: () => navigate({ to: "/etudiant/quiz" }) },
+    { icon: MessageCircle, label: "Hafatra", hint: "Vondron'ny fampiofanana", go: () => navigate({ to: "/etudiant/messages" }) },
+    { icon: Lightbulb, label: "Zarao ny fahaizanao", hint: "Hevitra ho an'ny IA", go: () => navigate({ to: "/etudiant/fahaizana" }) },
+  ];
+
+  const dash = useQuery({
+    queryKey: ["student-dashboard", studentName],
+    queryFn: () => studentDashboard({ data: { studentName } }),
+  });
+  const d = dash.data;
+  const stats = [
+    { icon: Coins, label: "Crédit IA", value: d ? (d.credits > 0 ? d.credits : d.freeUsed ? 0 : "1 free") : "…", onClick: () => setPaywall(true) },
+    { icon: PackageSearch, label: "Famakafakana", value: d?.analysesCount ?? "…" },
+    { icon: TrendingUp, label: "Quiz", value: d ? `${d.quizPct}%` : "…" },
+    { icon: Bot, label: "Resaka", value: d?.lastConversations.length ?? "…" },
   ];
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 pb-12 pt-5">
-      <Link to="/" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground">
-        <ArrowLeft className="size-4" /> Fandraisana
-      </Link>
-
-      <header
-        className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-3xl px-5 py-5 text-primary-foreground"
-        style={{ background: "var(--gradient-hero)", boxShadow: "var(--shadow-glow)" }}
-      >
+    <main className="mx-auto min-h-screen w-full max-w-3xl px-4 pb-6 pt-4">
+      <header className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wide opacity-80">Sehatry mpianatra</p>
-          <h1 className="truncate text-2xl font-bold">Manao ahoana {studentName}</h1>
+          <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+            <span className="text-china">Shina</span> <span className="text-primary">→</span> <span className="text-mada">Madagasikara</span>
+          </p>
+          <h1 className="truncate text-xl font-bold">Manao ahoana {studentName}</h1>
+          <p className="text-xs text-muted-foreground">Mpanampy Business Fanafarana</p>
         </div>
-        <button
-          onClick={onSwitchProfile}
-          className="shrink-0 rounded-full bg-primary-foreground/15 px-3 py-1.5 text-xs font-medium"
-        >
-          Ovay
-        </button>
-      </header>
-
-      <div className="mt-3 flex items-center justify-between gap-2 rounded-2xl border border-border bg-card px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="text-sm text-muted-foreground">Crédit IA</p>
+        <div className="flex shrink-0 items-center gap-2">
           <CreditBadge studentName={studentName} onClick={() => setPaywall(true)} />
+          <button onClick={onSwitchProfile} className="pressable rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground">
+            Ovay
+          </button>
         </div>
-        <Button size="sm" onClick={() => setPaywall(true)}>
-          <ShoppingCart className="mr-1.5 size-4" /> Hividy crédit
-        </Button>
-      </div>
+      </header>
       <PaywallDialog studentName={studentName} open={paywall} onOpenChange={setPaywall} />
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        {tiles.map(({ icon: Icon, label, hint, go }) => (
+      {/* Assistant IA mis en avant */}
+      <section
+        className="animate-rise relative mt-4 overflow-hidden rounded-3xl border border-border p-5"
+        style={{ background: "var(--gradient-ai)", boxShadow: "var(--shadow-glow)" }}
+      >
+        <div className="flex items-start gap-3">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl text-primary-foreground" style={{ background: "var(--gradient-accent)" }}>
+            <Bot className="size-6" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-lg font-bold">Mpanampy Fanafarana IA</p>
+            <p className="text-sm text-muted-foreground">Anontanio izay tianao momba ny business fanafarana Shina → Mada.</p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button className="pressable" onClick={() => navigate({ to: "/etudiant/assistant" })}>
+            <Sparkles className="mr-1.5 size-4" /> Hanontany ny mpanampy
+          </Button>
+          <Button variant="secondary" className="pressable" onClick={() => setPaywall(true)}>
+            <ShoppingCart className="mr-1.5 size-4" /> Hividy crédit
+          </Button>
+        </div>
+      </section>
+
+      <SectionTitle>Ny asako</SectionTitle>
+      <div className="grid grid-cols-4 gap-2">
+        {stats.map(({ icon: Icon, label, value, onClick }, i) => (
           <button
             key={label}
-            onClick={go}
-            className="flex flex-col items-start gap-2 rounded-3xl border border-border bg-card p-4 text-left transition-transform active:scale-[0.98]"
-            style={{ boxShadow: "var(--shadow-card)" }}
+            onClick={onClick}
+            disabled={!onClick}
+            className="animate-rise pressable rounded-2xl border border-border bg-card p-2.5 text-left"
+            style={{ animationDelay: `${i * 40}ms` }}
           >
-            <span
-              className="flex size-10 items-center justify-center rounded-2xl text-primary-foreground"
-              style={{ background: "var(--gradient-accent)" }}
-            >
-              <Icon className="size-5" />
-            </span>
-            <span className="text-sm font-semibold leading-tight">{label}</span>
-            <span className="text-xs leading-tight text-muted-foreground">{hint}</span>
+            <Icon className="size-4 text-primary" />
+            <p className="mt-1.5 truncate text-base font-bold">{value}</p>
+            <p className="truncate text-[10px] text-muted-foreground">{label}</p>
           </button>
         ))}
       </div>
 
-      <h2 className="mt-7 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-        Ny fampiofanako
-      </h2>
+      <SectionTitle>Fitaovana fanafarana</SectionTitle>
+      <div className="grid grid-cols-2 gap-2.5">
+        {tools.map(({ icon: Icon, label, hint, tone, go }, i) => (
+          <button
+            key={label}
+            onClick={go}
+            className="animate-rise pressable flex items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left"
+            style={{ boxShadow: "var(--shadow-card)", animationDelay: `${i * 40}ms` }}
+          >
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl text-primary-foreground" style={{ background: tone }}>
+              <Icon className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold leading-tight">{label}</span>
+              <span className="block truncate text-[11px] text-muted-foreground">{hint}</span>
+            </span>
+          </button>
+        ))}
+      </div>
 
-      <div className="relative my-3">
+      <SectionTitle>Mianatra</SectionTitle>
+      <div className="grid grid-cols-3 gap-2.5">
+        {learn.map(({ icon: Icon, label, hint, go }) => (
+          <button key={label} onClick={go} className="pressable flex flex-col items-start gap-1.5 rounded-2xl border border-border bg-card p-3 text-left">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+              <Icon className="size-4" />
+            </span>
+            <span className="text-xs font-semibold leading-tight">{label}</span>
+            <span className="text-[10px] leading-tight text-muted-foreground">{hint}</span>
+          </button>
+        ))}
+      </div>
+
+      <SectionTitle>Ny fampiofanako</SectionTitle>
+      <div className="relative mb-3">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          className="pl-9"
+          className="bg-card pl-9"
           placeholder="Hitady dosie"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
