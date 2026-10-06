@@ -78,8 +78,8 @@ function Accueil() {
           >
             <GraduationCap className="size-7 shrink-0" />
             <span className="min-w-0 flex-1">
-              <span className="block text-lg font-semibold">Sehatry mpianatra</span>
-              <span className="block text-sm opacity-85">Kojia, IA, fanadinana ary vondrona</span>
+              <span className="block text-lg font-semibold text-foreground">Sehatry mpianatra</span>
+              <span className="block text-sm font-medium text-foreground/95">Kojia, IA, fanadinana ary vondrona</span>
             </span>
             <ArrowRight className="size-5 shrink-0 opacity-80" />
           </Link>
