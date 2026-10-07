@@ -306,46 +306,76 @@ export type Database = {
       }
       kb_products: {
         Row: {
+          aliases: string | null
           category: string | null
           created_at: string
           dimensions: string | null
           has_battery: boolean
+          height_cm: number | null
           id: string
           is_fragile: boolean
           is_liquid: boolean
+          length_cm: number | null
           material: string | null
           name: string
+          name_en: string | null
+          name_fr: string | null
+          name_mg: string | null
+          name_zh: string | null
+          platform_name: string | null
           transport_advice: string | null
           updated_at: string
+          volume_cm3: number | null
           weight_kg: number | null
+          width_cm: number | null
         }
         Insert: {
+          aliases?: string | null
           category?: string | null
           created_at?: string
           dimensions?: string | null
           has_battery?: boolean
+          height_cm?: number | null
           id?: string
           is_fragile?: boolean
           is_liquid?: boolean
+          length_cm?: number | null
           material?: string | null
           name: string
+          name_en?: string | null
+          name_fr?: string | null
+          name_mg?: string | null
+          name_zh?: string | null
+          platform_name?: string | null
           transport_advice?: string | null
           updated_at?: string
+          volume_cm3?: number | null
           weight_kg?: number | null
+          width_cm?: number | null
         }
         Update: {
+          aliases?: string | null
           category?: string | null
           created_at?: string
           dimensions?: string | null
           has_battery?: boolean
+          height_cm?: number | null
           id?: string
           is_fragile?: boolean
           is_liquid?: boolean
+          length_cm?: number | null
           material?: string | null
           name?: string
+          name_en?: string | null
+          name_fr?: string | null
+          name_mg?: string | null
+          name_zh?: string | null
+          platform_name?: string | null
           transport_advice?: string | null
           updated_at?: string
+          volume_cm3?: number | null
           weight_kg?: number | null
+          width_cm?: number | null
         }
         Relationships: []
       }
