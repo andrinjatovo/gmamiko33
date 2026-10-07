@@ -87,6 +87,7 @@ function StudentFolders({ studentName, onSwitchProfile }: { studentName: string;
   const { t } = useLang();
   const tools = [
     { icon: PackageSearch, label: t("Famakafakana vokatra", "Analyse produit"), hint: t("Vidiny, fitaterana, tombony", "Prix, transport, marge"), tone: "var(--gradient-accent)", go: () => navigate({ to: "/etudiant/analyse" }) },
+    { icon: Search, label: t("Lanja & Volume", "Poids & Volume"), hint: t("Fiaramanidina sy sambo", "Avion et maritime"), tone: "var(--gradient-china)", go: () => navigate({ to: "/etudiant/lanja" }) },
     { icon: LayoutDashboard, label: t("Ny fandrosoako", "Ma progression"), hint: t("Crédit, quiz, famakafakana", "Crédits, quiz, analyses"), tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/tableau" }) },
     { icon: Receipt, label: t("Tantaran'ny fividianana", "Historique d'achats"), hint: t("Ny crédit novidiko", "Mes crédits achetés"), tone: "var(--gradient-china)", go: () => navigate({ to: "/etudiant/commandes" }) },
     { icon: UserRound, label: t("Ny mombamomba ahy", "Mon profil"), hint: t("Sary, anarana, traikefa", "Photo, nom, expérience"), tone: "var(--gradient-mada)", go: () => navigate({ to: "/etudiant/profil" }) },
