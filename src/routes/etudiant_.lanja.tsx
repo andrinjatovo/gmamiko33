@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Plane, Search, Ship, Sparkles } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Loader2, LogIn, Plane, Search, Ship, Sparkles } from "lucide-react";
 import { searchWeight, estimateWeight } from "@/lib/weight.functions";
+import { getStudentSession } from "@/lib/student-auth.functions";
+import { getDeviceHash } from "@/lib/device-id";
 import { useLang } from "@/hooks/use-lang";
+import { CreditBadge } from "@/components/CreditBadge";
+import { PaywallDialog, isPaywallError } from "@/components/PaywallDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -81,6 +86,10 @@ function Block({ air, real, est, onEstimate, loading }: { air: boolean; real: Re
 
 function WeightSearch() {
   const { t } = useLang();
+  const qc = useQueryClient();
+  const [me, setMe] = useState<string | null>(null);
+  const [meLoading, setMeLoading] = useState(true);
+  const [paywall, setPaywall] = useState(false);
   const [q, setQ] = useState("");
   const [results, setResults] = useState<Result[] | null>(null);
   const [sel, setSel] = useState<Result | null>(null);
@@ -89,6 +98,24 @@ function WeightSearch() {
   const [estBusy, setEstBusy] = useState(false);
   const [err, setErr] = useState("");
 
+  useEffect(() => {
+    getStudentSession({ data: { deviceHash: getDeviceHash() } })
+      .then((p) => setMe(p.display_name))
+      .catch(() => setMe(null))
+      .finally(() => setMeLoading(false));
+  }, []);
+
+  const handleErr = (x: unknown) => {
+    if (isPaywallError(x)) {
+      setErr("");
+      setPaywall(true);
+    } else setErr(x instanceof Error ? x.message : "Erreur");
+  };
+
+  const refreshCredits = () => {
+    if (me) qc.invalidateQueries({ queryKey: ["my-account", me] });
+  };
+
   const run = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!q.trim()) return;
@@ -96,26 +123,61 @@ function WeightSearch() {
     try {
       const r = await searchWeight({ data: { query: q } });
       setResults(r); setSel(r[0] ?? null);
-    } catch (x) { setErr(x instanceof Error ? x.message : "Erreur"); }
+      refreshCredits();
+    } catch (x) { handleErr(x); }
     finally { setBusy(false); }
   };
 
   const estimate = async () => {
     setEstBusy(true); setErr("");
-    try { setEst(await estimateWeight({ data: { product: sel?.name ?? q } })); }
-    catch (x) { setErr(x instanceof Error ? x.message : "Erreur"); }
+    try {
+      setEst(await estimateWeight({ data: { product: sel?.name ?? q } }));
+      refreshCredits();
+    }
+    catch (x) { handleErr(x); }
     finally { setEstBusy(false); }
   };
 
   const searched = results !== null;
+
+  if (meLoading)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-7 animate-spin text-primary" />
+      </div>
+    );
+
+  if (!me)
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center px-5">
+        <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 text-center" style={{ boxShadow: "var(--shadow-card)" }}>
+          <LogIn className="mx-auto mb-3 size-8 text-primary" />
+          <h1 className="text-lg font-semibold">{t("Midira aloha", "Connectez-vous d'abord")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("Mila kaonty mpianatra ny fikarohana Lanja & Volume (1 crédit isaky ny fikarohana).", "La recherche Poids & Volume nécessite un compte étudiant (1 crédit par recherche).")}
+          </p>
+          <Button asChild className="mt-4 w-full">
+            <Link to="/etudiant">{t("Ho any amin'ny sehatry mpianatra", "Aller à l'espace étudiant")}</Link>
+          </Button>
+        </div>
+      </main>
+    );
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-4 pb-28 pt-5">
-      <Link to="/etudiant" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground">
-        <ArrowLeft className="size-4" /> {t("Sehatry mpianatra", "Espace étudiant")}
-      </Link>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <Link to="/etudiant" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+          <ArrowLeft className="size-4" /> {t("Sehatry mpianatra", "Espace étudiant")}
+        </Link>
+        <CreditBadge studentName={me} onClick={() => setPaywall(true)} />
+      </div>
+      {me && <PaywallDialog studentName={me} open={paywall} onOpenChange={setPaywall} />}
       <h1 className="text-2xl font-bold">{t("Lanja & Volume", "Poids & Volume")}</h1>
-      <p className="mb-4 text-sm text-muted-foreground">
+      <p className="mb-1 text-sm text-muted-foreground">
         {t("Soraty amin'ny malagasy, frantsay, anglisy, sinoa na anarana Pinduoduo/1688/Taobao/SHEIN.", "Écrivez en malgache, français, anglais, chinois ou le nom Pinduoduo/1688/Taobao/SHEIN.")}
+      </p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        {t("1 crédit isaky ny fikarohana na vinavina IA.", "1 crédit par recherche ou estimation IA.")}
       </p>
       <form onSubmit={run} className="mb-5 flex gap-2">
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="kiraro, shoes, chaussures, 女鞋…" />

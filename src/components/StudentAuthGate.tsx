@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Ban, Loader2, Mail, UserRound } from "lucide-react";
+import { Ban, KeyRound, Loader2, Mail, MailCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getStudentSession, setStudentName } from "@/lib/student-auth.functions";
@@ -9,6 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 type Profile = { display_name: string | null; blocked: boolean; block_reason: string | null; email: string };
+type State = "loading" | "auth" | "forgot" | "sent" | "name" | "blocked";
+
+const EMAIL_RE = /\S+@\S+\.\S+/;
 
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
@@ -22,11 +25,13 @@ function Card({ icon, title, children }: { icon: ReactNode; title: string; child
   );
 }
 
-/** Inscription email + code, contrôle « 1 téléphone = 1 compte », puis choix du pseudo. */
+/** Connexion / inscription email + mot de passe, contrôle « 1 téléphone = 1 compte », puis choix du pseudo. */
 export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: string) => void; onSignedOut: () => void }) {
-  const [state, setState] = useState<"loading" | "email" | "code" | "name" | "blocked">("loading");
+  const [state, setState] = useState<State>("loading");
+  const [tab, setTab] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -35,7 +40,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
       onSignedOut();
-      setState("email");
+      setState("auth");
       return;
     }
     try {
@@ -46,7 +51,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
       else onReady(p.display_name);
     } catch (e) {
       toast.error((e as Error).message);
-      setState("email");
+      setState("auth");
     }
   };
 
@@ -59,25 +64,44 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sendCode = async () => {
+  const login = async () => {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    setBusy(false);
+    if (error) toast.error("Mailaka na tenimiafina diso. Andramo indray.");
+  };
+
+  const signup = async () => {
+    if (password !== confirm) {
+      toast.error("Tsy mitovy ny tenimiafina roa.");
+      return;
+    }
+    setBusy(true);
+    const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
-      options: { shouldCreateUser: true, emailRedirectTo: `${window.location.origin}/etudiant` },
+      password,
+      options: { emailRedirectTo: `${window.location.origin}/etudiant` },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(error.message.includes("already") ? "Efa misy kaonty amin'io mailaka io. Se connecter kely." : error.message);
+      return;
+    }
+    if (data.session) load();
+    else setState("sent");
+  };
+
+  const forgot = async () => {
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setBusy(false);
     if (error) toast.error(error.message);
     else {
-      toast.success("Nalefa tany amin'ny mailaka ny kaody");
-      setState("code");
+      toast.success("Nalefa tany amin'ny mailaka ny rohy fanarenana.");
+      setState("auth");
     }
-  };
-
-  const verify = async () => {
-    setBusy(true);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim(), token: code.trim(), type: "email" });
-    setBusy(false);
-    if (error) toast.error("Kaody diso na lany daty.");
   };
 
   const saveName = async () => {
@@ -108,7 +132,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
         <p className="mt-2 text-sm text-muted-foreground">
           Kaonty iray ihany no azo atao isaky ny finday. Mifandraisa amin'ny mpitantana raha diso izany.
         </p>
-        <Button variant="outline" className="mt-5 w-full" onClick={() => supabase.auth.signOut().then(() => setState("email"))}>
+        <Button variant="outline" className="mt-5 w-full" onClick={() => supabase.auth.signOut().then(() => setState("auth"))}>
           Hivoaka
         </Button>
       </Card>
@@ -128,31 +152,118 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
       </Card>
     );
 
-  return (
-    <Card icon={<Mail className="size-6" />} title={state === "email" ? "Fisoratana anarana" : "Ampidiro ny kaody"}>
-      {state === "email" ? (
-        <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); sendCode(); }}>
-          <p className="text-sm text-muted-foreground">Ampidiro ny mailakao. Handefasanay kaody fanamarinana ianao.</p>
+  if (state === "sent")
+    return (
+      <Card icon={<MailCheck className="size-6" />} title="Hamarino ny mailakao">
+        <p className="mt-2 text-sm text-muted-foreground">
+          Nalefany tamin'ny <b>{email}</b> ny rohy fanamarinana. Tsindrio io rohy io (jereo koa ny Spam), avy eo miverena eto
+          ary mankany amin'ny <b>Se connecter</b>.
+        </p>
+        <Button className="mt-5 w-full" onClick={() => { setTab("login"); setState("auth"); }}>
+          Se connecter
+        </Button>
+      </Card>
+    );
+
+  if (state === "forgot")
+    return (
+      <Card icon={<KeyRound className="size-6" />} title="Tenimiafina adino?">
+        <p className="mt-1 text-sm text-muted-foreground">
+          Ampidiro ny mailakao. Handefasanay rohy hamoronana tenimiafina vaovao ianao.
+        </p>
+        <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); forgot(); }}>
           <Label>Mailaka (email)</Label>
           <Input type="email" autoFocus required placeholder="anarana@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Button type="submit" className="w-full" disabled={busy || !/\S+@\S+\.\S+/.test(email)}>
-            {busy && <Loader2 className="mr-2 size-4 animate-spin" />} Andefaso kaody
+          <Button type="submit" className="w-full" disabled={busy || !EMAIL_RE.test(email)}>
+            {busy && <Loader2 className="mr-2 size-4 animate-spin" />} Alefaso ny rohy
+          </Button>
+          <Button type="button" variant="ghost" className="w-full" onClick={() => setState("auth")}>
+            ← Miverina amin'ny Se connecter
           </Button>
         </form>
-      ) : (
-        <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); verify(); }}>
-          <p className="text-sm text-muted-foreground">
-            Jereo ny boaty mailaka <b>{email}</b> (sy ny Spam). Ampidiro ny kaody, na tsindrio ny rohy ao anaty mailaka.
+      </Card>
+    );
+
+  const validLogin = EMAIL_RE.test(email) && password.length >= 6;
+  const validSignup = validLogin && confirm.length > 0 && password === confirm;
+
+  return (
+    <Card icon={<Mail className="size-6" />} title="Sehatry mpianatra">
+      {/* Deux choix : Se connecter / Inscription */}
+      <div className="mt-4 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+        {(["login", "signup"] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => setTab(k)}
+            className={`pressable rounded-lg py-2 text-sm font-semibold transition-colors ${
+              tab === k ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+            }`}
+          >
+            {k === "login" ? "Se connecter" : "Inscription"}
+          </button>
+        ))}
+      </div>
+
+      <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); tab === "login" ? login() : signup(); }}>
+        <div className="space-y-1.5">
+          <Label>Mailaka (email)</Label>
+          <Input type="email" autoFocus required placeholder="anarana@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div className="space-y-1.5">
+          <Label>Tenimiafina (mot de passe)</Label>
+          <Input
+            type="password"
+            required
+            minLength={6}
+            placeholder="Farafahakeliny 6 litera"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        {tab === "signup" && (
+          <div className="space-y-1.5">
+            <Label>Avereno ny tenimiafina</Label>
+            <Input
+              type="password"
+              required
+              minLength={6}
+              placeholder="Soraty indray ny tenimiafina"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+            {confirm.length > 0 && password !== confirm && (
+              <p className="text-xs text-destructive">Tsy mitovy ny tenimiafina roa.</p>
+            )}
+          </div>
+        )}
+
+        <Button type="submit" className="w-full" disabled={busy || (tab === "login" ? !validLogin : !validSignup)}>
+          {busy && <Loader2 className="mr-2 size-4 animate-spin" />}
+          {tab === "login" ? "Se connecter" : "Créer mon compte"}
+        </Button>
+
+        {tab === "login" ? (
+          <>
+            <Button type="button" variant="ghost" className="w-full text-xs" onClick={() => setState("forgot")}>
+              Mot de passe oublié ?
+            </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              Mbola tsy manana kaonty?{" "}
+              <button type="button" className="font-semibold text-primary" onClick={() => setTab("signup")}>
+                Inscription
+              </button>
+            </p>
+          </>
+        ) : (
+          <p className="text-center text-xs text-muted-foreground">
+            Efa manana kaonty?{" "}
+            <button type="button" className="font-semibold text-primary" onClick={() => setTab("login")}>
+              Se connecter
+            </button>
           </p>
-          <Input inputMode="numeric" autoFocus placeholder="123456" maxLength={10} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
-          <Button type="submit" className="w-full" disabled={busy || code.length < 6}>
-            {busy && <Loader2 className="mr-2 size-4 animate-spin" />} Hamarino
-          </Button>
-          <Button type="button" variant="ghost" className="w-full" onClick={() => setState("email")}>
-            Hanova mailaka / handefa indray
-          </Button>
-        </form>
-      )}
+        )}
+      </form>
     </Card>
   );
 }

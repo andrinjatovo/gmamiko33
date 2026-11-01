@@ -106,6 +106,15 @@ export const adminAddCredits = createServerFn({ method: "POST" })
     const c = await import("./content.server");
     c.assertAdmin(data.adminCode);
     const m = await import("./billing.server");
-    await m.addCredits(data.studentName, data.amount, "approved");
+    await m.addCredits(data.studentName, data.amount, "approved", "admin_add");
     return { ok: true };
+  });
+
+export const adminFetchCreditTransactions = createServerFn({ method: "POST" })
+  .inputValidator((d: { adminCode: string }) => d)
+  .handler(async ({ data }) => {
+    const c = await import("./content.server");
+    c.assertAdmin(data.adminCode);
+    const m = await import("./billing.server");
+    return m.listCreditTransactions();
   });
