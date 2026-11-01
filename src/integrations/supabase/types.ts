@@ -102,6 +102,33 @@ export type Database = {
           },
         ]
       }
+      credit_transactions: {
+        Row: {
+          created_at: string
+          credits: number
+          id: string
+          operation: string
+          student_name: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          credits: number
+          id?: string
+          operation: string
+          student_name: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          credits?: number
+          id?: string
+          operation?: string
+          student_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       folder_students: {
         Row: {
           created_at: string
