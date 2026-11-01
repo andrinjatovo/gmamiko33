@@ -111,16 +111,23 @@ export async function refundCredit(studentName: string, mode: "free" | "credit")
     .maybeSingle();
   if (!acc) return;
   if (mode === "free") await supabaseAdmin.from("student_accounts").update({ free_used: false }).eq("id", acc.id);
-  else
+  else {
     await supabaseAdmin
       .from("student_accounts")
       .update({ credits_messages: acc.credits_messages + 1 })
       .eq("id", acc.id);
+    await logTransaction(name, 1, "refund");
+  }
 }
 
 /** Exécute une action payante : déduit avant, rembourse si l'action échoue. */
-export async function withCredit<T>(studentName: string, action: () => Promise<T>) {
-  const mode = await consumeCredit(studentName);
+export async function withCredit<T>(
+  studentName: string,
+  action: () => Promise<T>,
+  operation: CreditOperation = "assistant",
+  userId: string | null = null,
+) {
+  const mode = await consumeCredit(studentName, operation, userId);
   try {
     return await action();
   } catch (e) {
@@ -247,7 +254,12 @@ export async function reviewPaymentRequest(id: string, decision: "approved" | "r
       .upsert({ student_name: req.student_name, statut_paiement: "rejected" }, { onConflict: "student_name" });
 }
 
-export async function addCredits(studentName: string, amount: number, status: PaymentStatus | null = null) {
+export async function addCredits(
+  studentName: string,
+  amount: number,
+  status: PaymentStatus | null = null,
+  operation: CreditOperation = "purchase",
+) {
   const name = normName(studentName);
   const n = Math.max(0, Math.floor(amount));
   await supabaseAdmin.from("student_accounts").upsert({ student_name: name }, { onConflict: "student_name", ignoreDuplicates: true });
@@ -262,6 +274,18 @@ export async function addCredits(studentName: string, amount: number, status: Pa
   if (status) patch.statut_paiement = status;
   const { error } = await supabaseAdmin.from("student_accounts").update(patch).eq("id", acc!.id);
   if (error) throw new Error(error.message);
+  if (n > 0) await logTransaction(name, n, operation);
+}
+
+/** Historique des transactions de crédits (admin). */
+export async function listCreditTransactions() {
+  const { data, error } = await supabaseAdmin
+    .from("credit_transactions")
+    .select("id, student_name, credits, operation, created_at")
+    .order("created_at", { ascending: false })
+    .limit(300);
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export async function listAccounts() {
