@@ -173,8 +173,11 @@ function WeightSearch() {
       </div>
       {me && <PaywallDialog studentName={me} open={paywall} onOpenChange={setPaywall} />}
       <h1 className="text-2xl font-bold">{t("Lanja & Volume", "Poids & Volume")}</h1>
-      <p className="mb-4 text-sm text-muted-foreground">
+      <p className="mb-1 text-sm text-muted-foreground">
         {t("Soraty amin'ny malagasy, frantsay, anglisy, sinoa na anarana Pinduoduo/1688/Taobao/SHEIN.", "Écrivez en malgache, français, anglais, chinois ou le nom Pinduoduo/1688/Taobao/SHEIN.")}
+      </p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        {t("1 crédit isaky ny fikarohana na vinavina IA.", "1 crédit par recherche ou estimation IA.")}
       </p>
       <form onSubmit={run} className="mb-5 flex gap-2">
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="kiraro, shoes, chaussures, 女鞋…" />
