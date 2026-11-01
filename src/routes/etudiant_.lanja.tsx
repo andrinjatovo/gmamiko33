@@ -139,11 +139,39 @@ function WeightSearch() {
   };
 
   const searched = results !== null;
+
+  if (meLoading)
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-7 animate-spin text-primary" />
+      </div>
+    );
+
+  if (!me)
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center px-5">
+        <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 text-center" style={{ boxShadow: "var(--shadow-card)" }}>
+          <LogIn className="mx-auto mb-3 size-8 text-primary" />
+          <h1 className="text-lg font-semibold">{t("Midira aloha", "Connectez-vous d'abord")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("Mila kaonty mpianatra ny fikarohana Lanja & Volume (1 crédit isaky ny fikarohana).", "La recherche Poids & Volume nécessite un compte étudiant (1 crédit par recherche).")}
+          </p>
+          <Button asChild className="mt-4 w-full">
+            <Link to="/etudiant">{t("Ho any amin'ny sehatry mpianatra", "Aller à l'espace étudiant")}</Link>
+          </Button>
+        </div>
+      </main>
+    );
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-3xl px-4 pb-28 pt-5">
-      <Link to="/etudiant" className="mb-4 inline-flex items-center gap-2 text-sm text-muted-foreground">
-        <ArrowLeft className="size-4" /> {t("Sehatry mpianatra", "Espace étudiant")}
-      </Link>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <Link to="/etudiant" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+          <ArrowLeft className="size-4" /> {t("Sehatry mpianatra", "Espace étudiant")}
+        </Link>
+        <CreditBadge studentName={me} onClick={() => setPaywall(true)} />
+      </div>
+      {me && <PaywallDialog studentName={me} open={paywall} onOpenChange={setPaywall} />}
       <h1 className="text-2xl font-bold">{t("Lanja & Volume", "Poids & Volume")}</h1>
       <p className="mb-4 text-sm text-muted-foreground">
         {t("Soraty amin'ny malagasy, frantsay, anglisy, sinoa na anarana Pinduoduo/1688/Taobao/SHEIN.", "Écrivez en malgache, français, anglais, chinois ou le nom Pinduoduo/1688/Taobao/SHEIN.")}
