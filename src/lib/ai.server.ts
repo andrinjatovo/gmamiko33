@@ -176,7 +176,7 @@ export async function listAiMessages(conversationId: string, studentName: string
 /** Pose une question à l'assistant et enregistre l'échange (1 crédit). */
 export async function askAssistant(conversationId: string, studentName: string, question: string) {
   const { withCredit } = await import("./billing.server");
-  return withCredit(studentName, () => askAssistantInner(conversationId, studentName, question));
+  return withCredit(studentName, () => askAssistantInner(conversationId, studentName, question), "assistant");
 }
 
 async function askAssistantInner(conversationId: string, studentName: string, question: string) {
