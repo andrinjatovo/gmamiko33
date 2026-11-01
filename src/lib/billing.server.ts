@@ -56,8 +56,35 @@ export class PaywallError extends Error {
   }
 }
 
+export type CreditOperation =
+  | "assistant"
+  | "analyse"
+  | "weight_search"
+  | "weight_estimate"
+  | "purchase"
+  | "admin_add"
+  | "refund";
+
+/** Journalise une transaction de crédits (ne fait jamais échouer l'opération principale). */
+async function logTransaction(studentName: string, credits: number, operation: CreditOperation, userId: string | null = null) {
+  try {
+    await supabaseAdmin.from("credit_transactions").insert({
+      student_name: studentName,
+      user_id: userId,
+      credits,
+      operation,
+    });
+  } catch {
+    // journalisation best-effort
+  }
+}
+
 /** Déduit 1 crédit (ou l'essai gratuit). Lève PaywallError si le solde est nul. */
-export async function consumeCredit(studentName: string): Promise<"free" | "credit"> {
+export async function consumeCredit(
+  studentName: string,
+  operation: CreditOperation = "assistant",
+  userId: string | null = null,
+): Promise<"free" | "credit"> {
   const name = normName(studentName);
   const { data: prof } = await supabaseAdmin
     .from("student_profiles")
@@ -67,7 +94,10 @@ export async function consumeCredit(studentName: string): Promise<"free" | "cred
   if (prof?.blocked) throw new Error("Voasakana ity kaonty ity (kaonty maromaro amin'ny finday iray).");
   const { data, error } = await supabaseAdmin.rpc("consume_message_credit", { p_student: name });
   if (error) throw new Error(error.message);
-  if (data === "free" || data === "credit") return data;
+  if (data === "free" || data === "credit") {
+    await logTransaction(name, data === "free" ? 0 : -1, operation, userId);
+    return data;
+  }
   throw new PaywallError();
 }
 
