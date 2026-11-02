@@ -51,6 +51,16 @@ type MethodForm = {
 
 const EMPTY: MethodForm = { label: "Mvola", number: "", holder: "", instructions: "", is_active: true };
 
+const OP_LABELS: Record<string, string> = {
+  assistant: "Mpanampy IA",
+  analyse: "Famakafakana vokatra",
+  weight_search: "Lanja & Volume",
+  weight_estimate: "Vinavina IA (lanja)",
+  purchase: "Fividianana crédit",
+  admin_add: "Nampian'ny mpitantana",
+  refund: "Naverina (tsy nety ny IA)",
+};
+
 function AdminPaiements() {
   const { code, ready } = useAdminCode();
   const qc = useQueryClient();
