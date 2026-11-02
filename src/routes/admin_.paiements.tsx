@@ -2,11 +2,12 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ArrowLeft, Check, Coins, CreditCard, Loader2, Plus, Trash2, Wallet, X } from "lucide-react";
+import { ArrowLeft, Check, Coins, CreditCard, History, Loader2, Plus, Trash2, Wallet, X } from "lucide-react";
 import {
   adminAddCredits,
   adminDeletePaymentMethod,
   adminFetchAccounts,
+  adminFetchCreditTransactions,
   adminFetchPaymentMethods,
   adminFetchPaymentRequests,
   adminReviewPayment,
@@ -50,6 +51,16 @@ type MethodForm = {
 
 const EMPTY: MethodForm = { label: "Mvola", number: "", holder: "", instructions: "", is_active: true };
 
+const OP_LABELS: Record<string, string> = {
+  assistant: "Mpanampy IA",
+  analyse: "Famakafakana vokatra",
+  weight_search: "Lanja & Volume",
+  weight_estimate: "Vinavina IA (lanja)",
+  purchase: "Fividianana crédit",
+  admin_add: "Nampian'ny mpitantana",
+  refund: "Naverina (tsy nety ny IA)",
+};
+
 function AdminPaiements() {
   const { code, ready } = useAdminCode();
   const qc = useQueryClient();
@@ -70,6 +81,11 @@ function AdminPaiements() {
     queryKey: ["admin-accounts"],
     enabled: ready && !!code,
     queryFn: () => adminFetchAccounts({ data: { adminCode: code! } }),
+  });
+  const txns = useQuery({
+    queryKey: ["admin-credit-txns"],
+    enabled: ready && !!code,
+    queryFn: () => adminFetchCreditTransactions({ data: { adminCode: code! } }),
   });
 
   const invalidate = () => {
@@ -170,6 +186,9 @@ function AdminPaiements() {
           </TabsTrigger>
           <TabsTrigger value="accounts" className="flex-1">
             Mpianatra
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex-1">
+            Tantara
           </TabsTrigger>
         </TabsList>
 
@@ -307,6 +326,40 @@ function AdminPaiements() {
                     <Coins className="mr-1 size-3.5" />+{n}
                   </Button>
                 ))}
+              </div>
+            ))
+          )}
+        </TabsContent>
+
+        {/* -------------------- Historique des crédits -------------------- */}
+        <TabsContent value="history" className="mt-4 space-y-2">
+          {txns.isLoading ? (
+            <div className="flex justify-center py-10">
+              <Loader2 className="size-6 animate-spin text-primary" />
+            </div>
+          ) : (txns.data ?? []).length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">Mbola tsy misy fifanakalozana crédit.</p>
+          ) : (
+            (txns.data ?? []).map((x) => (
+              <div
+                key={x.id}
+                className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3"
+                style={{ boxShadow: "var(--shadow-card)" }}
+              >
+                <History className="size-4 shrink-0 text-primary" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{x.student_name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {OP_LABELS[x.operation] ?? x.operation} · {new Date(x.created_at).toLocaleString("fr-FR")}
+                  </p>
+                </div>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                    x.credits > 0 ? "bg-mada/15 text-mada" : x.credits < 0 ? "bg-china/15 text-china" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {x.credits > 0 ? `+${x.credits}` : x.credits}
+                </span>
               </div>
             ))
           )}
