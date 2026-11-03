@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { Ban, KeyRound, Loader2, Mail, MailCheck, UserRound } from "lucide-react";
+import { Ban, Hourglass, KeyRound, Loader2, Mail, MessageCircle, UserRound, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { getStudentSession, setStudentName } from "@/lib/student-auth.functions";
@@ -8,10 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type Profile = { display_name: string | null; blocked: boolean; block_reason: string | null; email: string };
-type State = "loading" | "auth" | "forgot" | "sent" | "name" | "blocked";
+type Profile = {
+  display_name: string | null;
+  blocked: boolean;
+  block_reason: string | null;
+  email: string;
+  validation_status: string;
+};
+type State = "loading" | "auth" | "forgot" | "name" | "blocked" | "pending" | "rejected";
 
 const EMAIL_RE = /\S+@\S+\.\S+/;
+
+const WHATSAPP_URL =
+  "https://wa.me/8613025110873?text=Salama%20tompoko%2C%20MBA%20Mila%20fanampiana%20Manokana%20aho%2C%20Nanao%20inscription%20tao%20amin%27ny%20application%20fa%20tsy%20Mbola%20voamarina%20hatramin%27izao";
 
 function Card({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
@@ -25,7 +34,21 @@ function Card({ icon, title, children }: { icon: ReactNode; title: string; child
   );
 }
 
-/** Connexion / inscription email + mot de passe, contrôle « 1 téléphone = 1 compte », puis choix du pseudo. */
+function WhatsappHelp() {
+  return (
+    <a
+      href={WHATSAPP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="pressable mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-muted px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+    >
+      <MessageCircle className="size-4 text-[oklch(0.66_0.15_155)]" />
+      Mila fanampiana? Mifandraisa aminay amin'ny WhatsApp
+    </a>
+  );
+}
+
+/** Connexion / inscription email + mot de passe, validation manuelle par l'Admin, contrôle « 1 téléphone = 1 compte », puis choix du pseudo. */
 export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: string) => void; onSignedOut: () => void }) {
   const [state, setState] = useState<State>("loading");
   const [tab, setTab] = useState<"login" | "signup">("login");
@@ -36,6 +59,15 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
   const [busy, setBusy] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
 
+  const applyProfile = (p: Profile) => {
+    setProfile(p);
+    if (p.blocked) setState("blocked");
+    else if (p.validation_status === "rejected") setState("rejected");
+    else if (p.validation_status !== "approved") setState("pending");
+    else if (!p.display_name) setState("name");
+    else onReady(p.display_name);
+  };
+
   const load = async () => {
     const { data } = await supabase.auth.getUser();
     if (!data.user) {
@@ -45,10 +77,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
     }
     try {
       const p = await getStudentSession({ data: { deviceHash: getDeviceHash() } });
-      setProfile(p);
-      if (p.blocked) setState("blocked");
-      else if (!p.display_name) setState("name");
-      else onReady(p.display_name);
+      applyProfile(p);
     } catch (e) {
       toast.error((e as Error).message);
       setState("auth");
@@ -88,7 +117,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
       return;
     }
     if (data.session) load();
-    else setState("sent");
+    else setState("pending");
   };
 
   const forgot = async () => {
@@ -108,15 +137,15 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
     setBusy(true);
     try {
       const p = await setStudentName({ data: { deviceHash: getDeviceHash(), name } });
-      setProfile(p);
-      if (p.blocked) setState("blocked");
-      else if (p.display_name) onReady(p.display_name);
+      applyProfile(p);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setBusy(false);
     }
   };
+
+  const signOut = () => supabase.auth.signOut().then(() => setState("auth"));
 
   if (state === "loading")
     return (
@@ -132,9 +161,45 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
         <p className="mt-2 text-sm text-muted-foreground">
           Kaonty iray ihany no azo atao isaky ny finday. Mifandraisa amin'ny mpitantana raha diso izany.
         </p>
-        <Button variant="outline" className="mt-5 w-full" onClick={() => supabase.auth.signOut().then(() => setState("auth"))}>
+        <Button variant="outline" className="mt-5 w-full" onClick={signOut}>
           Hivoaka
         </Button>
+        <WhatsappHelp />
+      </Card>
+    );
+
+  if (state === "pending")
+    return (
+      <Card icon={<Hourglass className="size-6" />} title="Miandry fanamarinana">
+        <p className="mt-2 text-sm text-muted-foreground">
+          Vita ny fisoratana anaranao. Miandry ny fanamarinana avy amin'ny Admin ianao.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Rehefa eken'ny Admin ny kaontinao dia afaka miditra sy mampiasa ny fampiharana ianao.
+        </p>
+        <Button className="mt-5 w-full" disabled={busy} onClick={() => { setBusy(true); load().finally(() => setBusy(false)); }}>
+          {busy && <Loader2 className="mr-2 size-4 animate-spin" />} Hamarino indray
+        </Button>
+        <Button variant="outline" className="mt-2 w-full" onClick={signOut}>
+          Hivoaka
+        </Button>
+        <WhatsappHelp />
+      </Card>
+    );
+
+  if (state === "rejected")
+    return (
+      <Card icon={<XCircle className="size-6 text-destructive" />} title="Tsy nekena ny fisoratana">
+        <p className="mt-2 text-sm text-muted-foreground">
+          Miala tsiny fa tsy neken'ny Admin ny fisoratana anaranao, ka tsy afaka mampiasa ity fampiharana ity ianao.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Raha hevitrao fa diso izany dia mifandraisa aminay amin'ny WhatsApp.
+        </p>
+        <Button variant="outline" className="mt-5 w-full" onClick={signOut}>
+          Hivoaka
+        </Button>
+        <WhatsappHelp />
       </Card>
     );
 
@@ -149,19 +214,6 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
             {busy && <Loader2 className="mr-2 size-4 animate-spin" />} Manohy
           </Button>
         </form>
-      </Card>
-    );
-
-  if (state === "sent")
-    return (
-      <Card icon={<MailCheck className="size-6" />} title="Hamarino ny mailakao">
-        <p className="mt-2 text-sm text-muted-foreground">
-          Nalefany tamin'ny <b>{email}</b> ny rohy fanamarinana. Tsindrio io rohy io (jereo koa ny Spam), avy eo miverena eto
-          ary mankany amin'ny <b>Se connecter</b>.
-        </p>
-        <Button className="mt-5 w-full" onClick={() => { setTab("login"); setState("auth"); }}>
-          Se connecter
-        </Button>
       </Card>
     );
 
@@ -264,6 +316,7 @@ export function StudentAuthGate({ onReady, onSignedOut }: { onReady: (name: stri
           </p>
         )}
       </form>
+      <WhatsappHelp />
     </Card>
   );
 }
