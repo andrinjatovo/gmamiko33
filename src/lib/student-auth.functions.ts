@@ -93,3 +93,21 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
     if (!data.blocked) await db.from("student_devices").delete().eq("user_id", data.userId);
     return { ok: true };
   });
+
+/** Valider ou refuser une inscription (admin uniquement). */
+export const adminSetValidation = createServerFn({ method: "POST" })
+  .inputValidator((d: { adminCode: string; userId: string; status: "approved" | "rejected" }) => {
+    if (d.status !== "approved" && d.status !== "rejected") throw new Error("Statut tsy mety.");
+    return d;
+  })
+  .handler(async ({ data }) => {
+    const c = await import("./content.server");
+    c.assertAdmin(data.adminCode);
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { error } = await db
+      .from("student_profiles")
+      .update({ validation_status: data.status })
+      .eq("user_id", data.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
