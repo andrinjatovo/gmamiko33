@@ -29,7 +29,7 @@ async function checkDevice(userId: string, email: string, deviceHash: string) {
 
   const { data: p } = await db
     .from("student_profiles")
-    .select("display_name, blocked, block_reason, email")
+    .select("display_name, blocked, block_reason, email, validation_status")
     .eq("user_id", userId)
     .single();
   return p!;
@@ -73,7 +73,7 @@ export const adminListStudentProfiles = createServerFn({ method: "POST" })
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await db
       .from("student_profiles")
-      .select("user_id, email, display_name, blocked, block_reason, created_at")
+      .select("user_id, email, display_name, blocked, block_reason, validation_status, created_at")
       .order("created_at", { ascending: false })
       .limit(1000);
     if (error) throw new Error(error.message);
@@ -91,5 +91,23 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
       .update({ blocked: data.blocked, block_reason: data.blocked ? "Nosakanan'ny mpitantana." : null })
       .eq("user_id", data.userId);
     if (!data.blocked) await db.from("student_devices").delete().eq("user_id", data.userId);
+    return { ok: true };
+  });
+
+/** Valider ou refuser une inscription (admin uniquement). */
+export const adminSetValidation = createServerFn({ method: "POST" })
+  .inputValidator((d: { adminCode: string; userId: string; status: "approved" | "rejected" }) => {
+    if (d.status !== "approved" && d.status !== "rejected") throw new Error("Statut tsy mety.");
+    return d;
+  })
+  .handler(async ({ data }) => {
+    const c = await import("./content.server");
+    c.assertAdmin(data.adminCode);
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { error } = await db
+      .from("student_profiles")
+      .update({ validation_status: data.status })
+      .eq("user_id", data.userId);
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
