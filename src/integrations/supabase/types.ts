@@ -751,6 +751,7 @@ export type Database = {
           phone: string | null
           updated_at: string
           user_id: string
+          validation_status: string
         }
         Insert: {
           age?: number | null
@@ -768,6 +769,7 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id: string
+          validation_status?: string
         }
         Update: {
           age?: number | null
@@ -785,6 +787,7 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+          validation_status?: string
         }
         Relationships: []
       }

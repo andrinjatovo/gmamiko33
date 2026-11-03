@@ -22,6 +22,13 @@
       "when": 1793497966763,
       "tag": "0002_create_credit_transactions",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793687869246,
+      "tag": "0003_student_validation_status",
+      "breakpoints": true
     }
   ]
 }
