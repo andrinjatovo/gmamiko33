@@ -133,6 +133,23 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
 
   const { data, isLoading } = useQuery({ queryKey: ["folders"], queryFn: () => fetchFolders() });
 
+  // Notification : inscriptions en attente de validation (actualisé toutes les 15 s)
+  const { data: pendingVal } = useQuery({
+    queryKey: ["admin-pending-validations"],
+    queryFn: () => adminPendingValidations({ data: { adminCode } }),
+    refetchInterval: 15000,
+  });
+  const prevCount = useRef<number | null>(null);
+  useEffect(() => {
+    const c = pendingVal?.count;
+    if (c === undefined) return;
+    if (prevCount.current !== null && c > prevCount.current) {
+      const who = pendingVal?.latest?.display_name || pendingVal?.latest?.email || "Mpianatra vaovao";
+      toast(`Mpianatra vaovao miandry fanamarinana : ${who}`, { icon: <Bell className="size-4" /> });
+    }
+    prevCount.current = c;
+  }, [pendingVal]);
+
   const saveMutation = useMutation({
     mutationFn: (v: { id?: string; name: string; accessCode: string; maxUsers: number | null }) =>
       saveFolder({ data: { adminCode, ...v } }),
