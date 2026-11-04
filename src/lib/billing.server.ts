@@ -61,6 +61,7 @@ export type CreditOperation =
   | "analyse"
   | "weight_search"
   | "weight_estimate"
+  | "supplier_search"
   | "purchase"
   | "admin_add"
   | "refund";
