@@ -206,6 +206,29 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
         </button>
       </header>
 
+      {pendingVal && pendingVal.count > 0 ? (
+        <Link
+          to="/admin/comptes"
+          className="mt-4 flex items-center gap-3 rounded-3xl border border-primary/40 bg-accent p-4"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
+          <span className="relative flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Bell className="size-5" />
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+              {pendingVal.count}
+            </span>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold">
+              {pendingVal.count} mpianatra miandry fanamarinana
+            </span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {pendingVal.latest?.display_name || pendingVal.latest?.email || ""} — tsindrio raha hanamarina
+            </span>
+          </span>
+        </Link>
+      ) : null}
+
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {tiles.map(({ icon: Icon, label, hint, go }) => (
           <button
