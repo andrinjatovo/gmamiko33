@@ -94,6 +94,26 @@ export const adminSetBlocked = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Nombre d'inscriptions en attente de validation + la plus récente (admin uniquement). */
+export const adminPendingValidations = createServerFn({ method: "POST" })
+  .inputValidator((d: { adminCode: string }) => d)
+  .handler(async ({ data }) => {
+    const c = await import("./content.server");
+    c.assertAdmin(data.adminCode);
+    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { count } = await db
+      .from("student_profiles")
+      .select("user_id", { count: "exact", head: true })
+      .eq("validation_status", "pending");
+    const { data: latest } = await db
+      .from("student_profiles")
+      .select("display_name, email, created_at")
+      .eq("validation_status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    return { count: count ?? 0, latest: latest?.[0] ?? null };
+  });
+
 /** Valider ou refuser une inscription (admin uniquement). */
 export const adminSetValidation = createServerFn({ method: "POST" })
   .inputValidator((d: { adminCode: string; userId: string; status: "approved" | "rejected" }) => {

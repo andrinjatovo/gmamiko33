@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ArrowLeft,
+  Bell,
   Folder,
   Loader2,
   Lock,
@@ -22,6 +23,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { checkAdminCode, deleteRow, fetchFolderSecurity, fetchFolders, saveFolder } from "@/lib/content.functions";
+import { adminPendingValidations } from "@/lib/student-auth.functions";
 import { useAdminCode } from "@/hooks/use-admin-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,6 +133,23 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
 
   const { data, isLoading } = useQuery({ queryKey: ["folders"], queryFn: () => fetchFolders() });
 
+  // Notification : inscriptions en attente de validation (actualisé toutes les 15 s)
+  const { data: pendingVal } = useQuery({
+    queryKey: ["admin-pending-validations"],
+    queryFn: () => adminPendingValidations({ data: { adminCode } }),
+    refetchInterval: 15000,
+  });
+  const prevCount = useRef<number | null>(null);
+  useEffect(() => {
+    const c = pendingVal?.count;
+    if (c === undefined) return;
+    if (prevCount.current !== null && c > prevCount.current) {
+      const who = pendingVal?.latest?.display_name || pendingVal?.latest?.email || "Mpianatra vaovao";
+      toast(`Mpianatra vaovao miandry fanamarinana : ${who}`, { icon: <Bell className="size-4" /> });
+    }
+    prevCount.current = c;
+  }, [pendingVal]);
+
   const saveMutation = useMutation({
     mutationFn: (v: { id?: string; name: string; accessCode: string; maxUsers: number | null }) =>
       saveFolder({ data: { adminCode, ...v } }),
@@ -186,6 +205,29 @@ function Dashboard({ adminCode, onLogout }: { adminCode: string; onLogout: () =>
           Miala
         </button>
       </header>
+
+      {pendingVal && pendingVal.count > 0 ? (
+        <Link
+          to="/admin/comptes"
+          className="mt-4 flex items-center gap-3 rounded-3xl border border-primary/40 bg-accent p-4"
+          style={{ boxShadow: "var(--shadow-card)" }}
+        >
+          <span className="relative flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+            <Bell className="size-5" />
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+              {pendingVal.count}
+            </span>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold">
+              {pendingVal.count} mpianatra miandry fanamarinana
+            </span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {pendingVal.latest?.display_name || pendingVal.latest?.email || ""} — tsindrio raha hanamarina
+            </span>
+          </span>
+        </Link>
+      ) : null}
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {tiles.map(({ icon: Icon, label, hint, go }) => (
