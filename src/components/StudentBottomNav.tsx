@@ -4,7 +4,7 @@ import { Bot, GraduationCap, Home, UserRound, Wrench } from "lucide-react";
 
 const ITEMS = [
   { to: "/etudiant", label: "Fandraisana", fr: "Accueil", icon: Home, match: (p: string) => p === "/etudiant" },
-  { to: "/etudiant/analyse", label: "Fitaovana", fr: "Outils", icon: Wrench, match: (p: string) => p.startsWith("/etudiant/analyse") || p.startsWith("/etudiant/tableau") || p.startsWith("/etudiant/commandes") },
+  { to: "/etudiant/analyse", label: "Fitaovana", fr: "Outils", icon: Wrench, match: (p: string) => p.startsWith("/etudiant/analyse") || p.startsWith("/etudiant/tableau") || p.startsWith("/etudiant/commandes") || p.startsWith("/etudiant/mpamatsy") || p.startsWith("/etudiant/lanja") },
   { to: "/etudiant/quiz", label: "Fampiofanana", fr: "Formation", icon: GraduationCap, match: (p: string) => p.startsWith("/etudiant/quiz") || p.startsWith("/etudiant/messages") || p.startsWith("/etudiant/fahaizana") },
   { to: "/etudiant/assistant", label: "Mpanampy", fr: "Assistant", icon: Bot, match: (p: string) => p.startsWith("/etudiant/assistant") },
   { to: "/etudiant/profil", label: "Profil", fr: "Profil", icon: UserRound, match: (p: string) => p.startsWith("/etudiant/profil") },

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, BrainCircuit, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, BrainCircuit, Loader2, Pencil, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteKb, fetchKb, saveKb } from "@/lib/kb.functions";
+import { deleteKb, fetchKb, quickAddKb, saveKb } from "@/lib/kb.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -146,6 +146,9 @@ function KnowledgeAdmin() {
   const [table, setTable] = useState<Table>("kb_entries");
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Record<string, unknown> | null>(null);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickTitle, setQuickTitle] = useState("");
+  const [quickDesc, setQuickDesc] = useState("");
 
   if (ready && !adminCode) navigate({ to: "/admin" });
 
@@ -177,6 +180,18 @@ function KnowledgeAdmin() {
   const del = useMutation({
     mutationFn: (id: string) => deleteKb({ data: { adminCode: adminCode!, table, id } }),
     onSuccess: invalidate,
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const quickAdd = useMutation({
+    mutationFn: () => quickAddKb({ data: { adminCode: adminCode!, table, title: quickTitle, description: quickDesc } }),
+    onSuccess: () => {
+      setQuickOpen(false);
+      setQuickTitle("");
+      setQuickDesc("");
+      toast.success("Voarakitra — ny IA no nandamina sy naranga ny angona");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -218,7 +233,7 @@ function KnowledgeAdmin() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button size="icon" aria-label="Ampio" onClick={() => setEditing({})}>
+        <Button size="icon" aria-label="Ampio" onClick={() => setQuickOpen(true)}>
           <Plus className="size-4" />
         </Button>
       </div>
@@ -253,6 +268,61 @@ function KnowledgeAdmin() {
           ))
         )}
       </div>
+
+      {/* Ajout simplifié : titre + description, l'IA structure le reste */}
+      <Dialog open={quickOpen} onOpenChange={(o) => !o && setQuickOpen(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="size-5 text-primary" /> Ampio — {schema.label}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Soraty ny lohateny sy ny fanazavana fotsiny. Ny IA no mandinika, mandamina ary manasokaja ny angona ho an'ny
+            mpanampy.
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Lohateny</Label>
+              <Input
+                autoFocus
+                placeholder="Ohatra : Transitaire Guangzhou vaovao"
+                value={quickTitle}
+                onChange={(e) => setQuickTitle(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Fanazavana</Label>
+              <Textarea
+                rows={6}
+                placeholder="Soraty eto ny zavatra rehetra fantatrao : tarif, finday, rohy, traikefa, torohevitra…"
+                value={quickDesc}
+                onChange={(e) => setQuickDesc(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full"
+              disabled={quickAdd.isPending || !quickTitle.trim() || !quickDesc.trim()}
+              onClick={() => quickAdd.mutate()}
+            >
+              {quickAdd.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Sparkles className="mr-2 size-4" />}
+              {quickAdd.isPending ? "Ny IA no mandamina…" : "Tehirizo"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setQuickOpen(false);
+                setEditing({});
+              }}
+            >
+              Fanamenoana feno (sehatra rehetra)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
