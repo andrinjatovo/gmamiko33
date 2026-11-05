@@ -269,6 +269,61 @@ function KnowledgeAdmin() {
         )}
       </div>
 
+      {/* Ajout simplifié : titre + description, l'IA structure le reste */}
+      <Dialog open={quickOpen} onOpenChange={(o) => !o && setQuickOpen(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="size-5 text-primary" /> Ampio — {schema.label}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Soraty ny lohateny sy ny fanazavana fotsiny. Ny IA no mandinika, mandamina ary manasokaja ny angona ho an'ny
+            mpanampy.
+          </p>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Lohateny</Label>
+              <Input
+                autoFocus
+                placeholder="Ohatra : Transitaire Guangzhou vaovao"
+                value={quickTitle}
+                onChange={(e) => setQuickTitle(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Fanazavana</Label>
+              <Textarea
+                rows={6}
+                placeholder="Soraty eto ny zavatra rehetra fantatrao : tarif, finday, rohy, traikefa, torohevitra…"
+                value={quickDesc}
+                onChange={(e) => setQuickDesc(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex-col gap-2 sm:flex-col">
+            <Button
+              className="w-full"
+              disabled={quickAdd.isPending || !quickTitle.trim() || !quickDesc.trim()}
+              onClick={() => quickAdd.mutate()}
+            >
+              {quickAdd.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Sparkles className="mr-2 size-4" />}
+              {quickAdd.isPending ? "Ny IA no mandamina…" : "Tehirizo"}
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={() => {
+                setQuickOpen(false);
+                setEditing({});
+              }}
+            >
+              Fanamenoana feno (sehatra rehetra)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent className="max-h-[85vh] overflow-y-auto">
           <DialogHeader>
