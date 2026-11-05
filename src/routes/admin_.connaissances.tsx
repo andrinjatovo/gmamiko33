@@ -146,6 +146,9 @@ function KnowledgeAdmin() {
   const [table, setTable] = useState<Table>("kb_entries");
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState<Record<string, unknown> | null>(null);
+  const [quickOpen, setQuickOpen] = useState(false);
+  const [quickTitle, setQuickTitle] = useState("");
+  const [quickDesc, setQuickDesc] = useState("");
 
   if (ready && !adminCode) navigate({ to: "/admin" });
 
@@ -177,6 +180,18 @@ function KnowledgeAdmin() {
   const del = useMutation({
     mutationFn: (id: string) => deleteKb({ data: { adminCode: adminCode!, table, id } }),
     onSuccess: invalidate,
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const quickAdd = useMutation({
+    mutationFn: () => quickAddKb({ data: { adminCode: adminCode!, table, title: quickTitle, description: quickDesc } }),
+    onSuccess: () => {
+      setQuickOpen(false);
+      setQuickTitle("");
+      setQuickDesc("");
+      toast.success("Voarakitra — ny IA no nandamina sy naranga ny angona");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -218,7 +233,7 @@ function KnowledgeAdmin() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button size="icon" aria-label="Ampio" onClick={() => setEditing({})}>
+        <Button size="icon" aria-label="Ampio" onClick={() => setQuickOpen(true)}>
           <Plus className="size-4" />
         </Button>
       </div>
