@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, BrainCircuit, Loader2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, BrainCircuit, Loader2, Pencil, Plus, Search, Sparkles, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteKb, fetchKb, saveKb } from "@/lib/kb.functions";
+import { deleteKb, fetchKb, quickAddKb, saveKb } from "@/lib/kb.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, Coins, Folder, GraduationCap, LayoutDashboard, Lightbulb, Loader2, Lock, MessageCircle, PackageSearch, Receipt, Search, ShoppingCart, Sparkles, TrendingUp, UserRound } from "lucide-react";
+import { Bot, Coins, Folder, GraduationCap, LayoutDashboard, Lightbulb, Loader2, Lock, MessageCircle, PackageSearch, Receipt, Search, ShoppingCart, Sparkles, Store, TrendingUp, UserRound } from "lucide-react";
 import { studentDashboard } from "@/lib/dashboard.functions";
 import { fetchFolders } from "@/lib/content.functions";
 import { Button } from "@/components/ui/button";

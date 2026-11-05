@@ -28,6 +28,7 @@ import { Route as EtudiantCommandesRouteImport } from './routes/etudiant_.comman
 import { Route as EtudiantFahaizanaRouteImport } from './routes/etudiant_.fahaizana'
 import { Route as EtudiantLanjaRouteImport } from './routes/etudiant_.lanja'
 import { Route as EtudiantMessagesRouteImport } from './routes/etudiant_.messages'
+import { Route as EtudiantMpamatsyRouteImport } from './routes/etudiant_.mpamatsy'
 import { Route as EtudiantProfilRouteImport } from './routes/etudiant_.profil'
 import { Route as EtudiantQuizRouteImport } from './routes/etudiant_.quiz'
 import { Route as EtudiantTableauRouteImport } from './routes/etudiant_.tableau'
@@ -129,6 +130,11 @@ const EtudiantMessagesRoute = EtudiantMessagesRouteImport.update({
   path: '/etudiant/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EtudiantMpamatsyRoute = EtudiantMpamatsyRouteImport.update({
+  id: '/etudiant_/mpamatsy',
+  path: '/etudiant/mpamatsy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EtudiantProfilRoute = EtudiantProfilRouteImport.update({
   id: '/etudiant_/profil',
   path: '/etudiant/profil',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/etudiant/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant/lanja': typeof EtudiantLanjaRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
+  '/etudiant/mpamatsy': typeof EtudiantMpamatsyRoute
   '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
   '/etudiant/tableau': typeof EtudiantTableauRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/etudiant/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant/lanja': typeof EtudiantLanjaRoute
   '/etudiant/messages': typeof EtudiantMessagesRoute
+  '/etudiant/mpamatsy': typeof EtudiantMpamatsyRoute
   '/etudiant/profil': typeof EtudiantProfilRoute
   '/etudiant/quiz': typeof EtudiantQuizRoute
   '/etudiant/tableau': typeof EtudiantTableauRoute
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/etudiant_/fahaizana': typeof EtudiantFahaizanaRoute
   '/etudiant_/lanja': typeof EtudiantLanjaRoute
   '/etudiant_/messages': typeof EtudiantMessagesRoute
+  '/etudiant_/mpamatsy': typeof EtudiantMpamatsyRoute
   '/etudiant_/profil': typeof EtudiantProfilRoute
   '/etudiant_/quiz': typeof EtudiantQuizRoute
   '/etudiant_/tableau': typeof EtudiantTableauRoute
@@ -257,6 +266,7 @@ export interface FileRouteTypes {
     | '/etudiant/fahaizana'
     | '/etudiant/lanja'
     | '/etudiant/messages'
+    | '/etudiant/mpamatsy'
     | '/etudiant/profil'
     | '/etudiant/quiz'
     | '/etudiant/tableau'
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/etudiant/fahaizana'
     | '/etudiant/lanja'
     | '/etudiant/messages'
+    | '/etudiant/mpamatsy'
     | '/etudiant/profil'
     | '/etudiant/quiz'
     | '/etudiant/tableau'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/etudiant_/fahaizana'
     | '/etudiant_/lanja'
     | '/etudiant_/messages'
+    | '/etudiant_/mpamatsy'
     | '/etudiant_/profil'
     | '/etudiant_/quiz'
     | '/etudiant_/tableau'
@@ -336,6 +348,7 @@ export interface RootRouteChildren {
   EtudiantFahaizanaRoute: typeof EtudiantFahaizanaRoute
   EtudiantLanjaRoute: typeof EtudiantLanjaRoute
   EtudiantMessagesRoute: typeof EtudiantMessagesRoute
+  EtudiantMpamatsyRoute: typeof EtudiantMpamatsyRoute
   EtudiantProfilRoute: typeof EtudiantProfilRoute
   EtudiantQuizRoute: typeof EtudiantQuizRoute
   EtudiantTableauRoute: typeof EtudiantTableauRoute
@@ -478,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EtudiantMessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/etudiant_/mpamatsy': {
+      id: '/etudiant_/mpamatsy'
+      path: '/etudiant/mpamatsy'
+      fullPath: '/etudiant/mpamatsy'
+      preLoaderRoute: typeof EtudiantMpamatsyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/etudiant_/profil': {
       id: '/etudiant_/profil'
       path: '/etudiant/profil'
@@ -536,6 +556,7 @@ const rootRouteChildren: RootRouteChildren = {
   EtudiantFahaizanaRoute: EtudiantFahaizanaRoute,
   EtudiantLanjaRoute: EtudiantLanjaRoute,
   EtudiantMessagesRoute: EtudiantMessagesRoute,
+  EtudiantMpamatsyRoute: EtudiantMpamatsyRoute,
   EtudiantProfilRoute: EtudiantProfilRoute,
   EtudiantQuizRoute: EtudiantQuizRoute,
   EtudiantTableauRoute: EtudiantTableauRoute,
