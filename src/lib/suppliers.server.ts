@@ -71,14 +71,16 @@ async function externalSearch(query: string, scope: SupplierScope): Promise<Supp
     for (const b of blocks) {
       const hrefM = b.match(/href="([^"]+)"/);
       const titleM = b.match(/>([\s\S]*?)<\/a>/);
-      if (!hrefM || !titleM) continue;
-      let url = hrefM[1].replace(/&amp;/g, "&");
-      const uddg = url.match(/[?&]uddg=([^&]+)/);
-      if (uddg) url = decodeURIComponent(uddg[1]);
-      const name = stripTags(titleM[1]).slice(0, 140);
+      const href = hrefM?.[1];
+      const rawTitle = titleM?.[1];
+      if (!href || !rawTitle) continue;
+      let url = href.replace(/&amp;/g, "&");
+      const uddg = url.match(/[?&]uddg=([^&]+)/)?.[1];
+      if (uddg) url = decodeURIComponent(uddg);
+      const name = stripTags(rawTitle).slice(0, 140);
       if (!name) continue;
-      const snipM = b.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/);
-      const snippet = snipM ? stripTags(snipM[1]).slice(0, 300) : null;
+      const rawSnip = b.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/)?.[1];
+      const snippet = rawSnip ? stripTags(rawSnip).slice(0, 300) : null;
       let host = "";
       try {
         host = new URL(url).hostname.replace(/^www\./, "");
