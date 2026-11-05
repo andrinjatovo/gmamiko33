@@ -49,63 +49,84 @@ function stripTags(s: string) {
     .trim();
 }
 
-/** Recherche web publique via DuckDuckGo (liens réels uniquement). */
+type WebResult = { name?: string; platform?: string; url?: string; location?: string; description?: string };
+
+/**
+ * Recherche web publique réelle via Google Search (grounding Gemini sur la
+ * passerelle IA). Ne liste que ce que la recherche a réellement trouvé :
+ * les URL invalides sont écartées, et un échec est signalé, jamais masqué.
+ */
 async function externalSearch(query: string, scope: SupplierScope): Promise<SupplierCard[]> {
-  const hint = scope === "local" ? "Madagascar" : scope === "foreign" ? "China" : "";
-  const q = `${query} ${hint}`.trim();
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const res = await fetch(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(q)}`, {
-      signal: controller.signal,
-      headers: {
-        "user-agent": "Mozilla/5.0 (compatible; GmamikoBot/1.0)",
-        accept: "text/html",
-        "accept-language": "fr,mg,en;q=0.8",
-      },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const html = await res.text();
-    const out: SupplierCard[] = [];
-    const blocks = html.split('class="result__a"').slice(1, 9);
-    for (const b of blocks) {
-      const hrefM = b.match(/href="([^"]+)"/);
-      const titleM = b.match(/>([\s\S]*?)<\/a>/);
-      const href = hrefM?.[1];
-      const rawTitle = titleM?.[1];
-      if (!href || !rawTitle) continue;
-      let url = href.replace(/&amp;/g, "&");
-      const uddg = url.match(/[?&]uddg=([^&]+)/)?.[1];
-      if (uddg) url = decodeURIComponent(uddg);
-      const name = stripTags(rawTitle).slice(0, 140);
-      if (!name) continue;
-      const rawSnip = b.match(/class="result__snippet"[^>]*>([\s\S]*?)<\/a>/)?.[1];
-      const snippet = rawSnip ? stripTags(rawSnip).slice(0, 300) : null;
-      let host = "";
+  const apiKey = process.env["LOVABLE_API_KEY"];
+  if (!apiKey) throw new Error("Clé IA tsy hita.");
+  const { createOpenAICompatible } = await import("@ai-sdk/openai-compatible");
+  const { streamText } = await import("ai");
+  const gateway = createOpenAICompatible({
+    name: "lovable",
+    baseURL: "https://ai.gateway.lovable.dev/v1",
+    headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
+    fetch: (input, init) => {
+      const body = JSON.parse(String(init?.body));
+      body.tools = [...(body.tools ?? []), { type: "google_search" }];
+      return fetch(input, { ...init, body: JSON.stringify(body) });
+    },
+  });
+  const scopeHint =
+    scope === "local"
+      ? "à Madagascar uniquement"
+      : scope === "foreign"
+        ? "en Chine / sur les plateformes chinoises uniquement"
+        : "à Madagascar et en Chine";
+  const result = streamText({
+    model: gateway("google/gemini-3.6-flash"),
+    system: `Tu es le moteur de recherche fournisseurs de GMAMIKO33 (importation Chine → Madagascar).
+Utilise Google Search pour trouver de VRAIS fournisseurs, boutiques, pages Facebook/Instagram ou produits ${scopeHint}, correspondant à la recherche de l'étudiant.
+Réponds UNIQUEMENT en JSON valide (sans markdown) :
+{"results":[{"name":"...","platform":"Facebook/Instagram/1688/...","url":"https://...","location":"...","description":"..."}]}
+RÈGLES ABSOLUES :
+- Ne liste QUE des résultats réellement trouvés par la recherche Google, avec leur vrai lien direct.
+- N'invente JAMAIS une boutique, une page, un produit, un avis ou un lien.
+- Si la recherche ne donne rien de pertinent, renvoie {"results":[]}.
+- Descriptions en malagasy simple. Maximum 8 résultats.`,
+    prompt: query,
+  });
+  const text = await result.text;
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) return [];
+  const parsed = JSON.parse(m[0]) as { results?: WebResult[] };
+  const out: SupplierCard[] = [];
+  for (const r of (parsed.results ?? []).slice(0, 8)) {
+    const name = typeof r.name === "string" ? r.name.trim().slice(0, 140) : "";
+    if (!name) continue;
+    let url: string | null = null;
+    let host = "";
+    if (typeof r.url === "string") {
       try {
-        host = new URL(url).hostname.replace(/^www\./, "");
+        const u = new URL(r.url);
+        if (u.protocol === "http:" || u.protocol === "https:") {
+          url = u.toString();
+          host = u.hostname.replace(/^www\./, "");
+        }
       } catch {
-        continue;
+        /* lien invalide écarté */
       }
-      out.push({
-        ref: 0,
-        kind: "web",
-        name,
-        subtitle: snippet,
-        location: null,
-        platform: host,
-        url,
-        notes: null,
-        source: `Internet — ${host}`,
-        reliability: null,
-        why: null,
-        advice: null,
-      });
     }
-    return out;
-  } finally {
-    clearTimeout(timer);
+    out.push({
+      ref: 0,
+      kind: "web",
+      name,
+      subtitle: typeof r.description === "string" ? stripTags(r.description).slice(0, 300) : null,
+      location: typeof r.location === "string" ? r.location.slice(0, 80) : null,
+      platform: [r.platform, host].filter(Boolean).join(" · ") || null,
+      url,
+      notes: null,
+      source: `Internet — Google Search${host ? ` (${host})` : ""}`,
+      reliability: null,
+      why: null,
+      advice: null,
+    });
   }
+  return out;
 }
 
 type AiEval = {
