@@ -1,8 +1,6 @@
 // Server-only logic for the courses app. Never imported from client code.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export const ADMIN_CODE = "99910021";
-
 export type ItemType = "image" | "pdf" | "word" | "link" | "text";
 
 export type PublicFolder = {
@@ -31,7 +29,8 @@ export type BlockWithItems = {
 };
 
 export function assertAdmin(code: string) {
-  if (code !== ADMIN_CODE) throw new Error("Code administrateur incorrect.");
+  const expected = process.env['ADMIN_ACCESS_CODE'];
+  if (!expected || !code || code !== expected) throw new Error("Code administrateur incorrect.");
 }
 
 export async function listFolders(): Promise<PublicFolder[]> {
