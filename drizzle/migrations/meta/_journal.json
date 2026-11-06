@@ -29,6 +29,13 @@
       "when": 1793687869246,
       "tag": "0003_student_validation_status",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793950729969,
+      "tag": "0004_admin_assisted_password_recovery",
+      "breakpoints": true
     }
   ]
 }

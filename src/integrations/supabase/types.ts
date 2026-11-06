@@ -463,6 +463,51 @@ export type Database = {
         }
         Relationships: []
       }
+      password_reset_requests: {
+        Row: {
+          attempts: number
+          code_ciphertext: string | null
+          code_hash: string
+          created_at: string
+          email: string
+          expires_at: string
+          grant_hash: string | null
+          handled_at: string | null
+          id: string
+          status: string
+          used_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_ciphertext?: string | null
+          code_hash: string
+          created_at?: string
+          email: string
+          expires_at: string
+          grant_hash?: string | null
+          handled_at?: string | null
+          id: string
+          status?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_ciphertext?: string | null
+          code_hash?: string
+          created_at?: string
+          email?: string
+          expires_at?: string
+          grant_hash?: string | null
+          handled_at?: string | null
+          id?: string
+          status?: string
+          used_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           created_at: string
@@ -796,7 +841,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_password_reset: {
+        Args: { p_email: string; p_grant: string }
+        Returns: string
+      }
       consume_message_credit: { Args: { p_student: string }; Returns: string }
+      request_password_reset: {
+        Args: {
+          p_cipher: string
+          p_email: string
+          p_hash: string
+          p_id: string
+        }
+        Returns: undefined
+      }
+      verify_password_reset: {
+        Args: { p_email: string; p_grant: string; p_hash: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
